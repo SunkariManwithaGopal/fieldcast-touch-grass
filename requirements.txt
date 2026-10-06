@@ -4,4 +4,6 @@ pandas>=2.2.0
 numpy>=1.26.0
 scikit-learn>=1.4.0
 tabpfn>=2.0.0
+backboard-sdk>=1.5.19
 python-multipart>=0.0.9
+httpx>=0.27.0

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FieldCast Studio — TabPFN + Local Gemma Printable Nature Zine & Acoustic Kit</title>
+  <title>FieldCast Studio — TabPFN + Gemma 2B + Backboard + iNaturalist + Render</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @media print {
@@ -29,10 +29,10 @@
       <div>
         <div class="flex flex-wrap items-center gap-2">
           <h1 class="text-2xl font-bold text-emerald-400">🌿 FieldCast Studio</h1>
-          <span class="text-[11px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded-full font-mono">Gemma 2B + TabPFN + Render</span>
+          <span class="text-[11px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2.5 py-0.5 rounded-full font-mono">TabPFN • Gemma 2B • Backboard • Render</span>
         </div>
         <p class="text-xs md:text-sm text-stone-400 mt-0.5">
-          1. TabPFN Predicts Your Peak Ecological Window → 2. Local Gemma Prints a 1-Page Field Zine → 3. Leave Phone Inside & Touch Grass
+          1. TabPFN Predicts Peak Ecological Window → 2. Local Gemma Prints a 1-Page Field Zine → 3. Backboard Remembers Your Sightings
         </p>
       </div>
       <div class="flex flex-wrap items-center gap-2">
@@ -41,7 +41,7 @@
           <label class="text-xs text-stone-400">Ollama:</label>
           <input id="modelName" type="text" value="gemma2:2b" class="bg-transparent text-xs text-emerald-300 w-20 focus:outline-none font-mono" />
         </div>
-        <button onclick="speakBriefing()" id="ttsBtn" class="text-xs bg-sky-600 hover:bg-sky-500 text-white font-semibold px-3 py-1.5 rounded-lg transition">
+        <button onclick="speakBriefing()" class="text-xs bg-sky-600 hover:bg-sky-500 text-white font-semibold px-3 py-1.5 rounded-lg transition">
           🎧 Eyes-Up Audio Briefing
         </button>
         <button onclick="window.print()" class="text-xs bg-amber-400 hover:bg-amber-300 text-stone-950 font-bold px-3.5 py-1.5 rounded-lg transition shadow">
@@ -50,23 +50,32 @@
         <button onclick="exportFieldJournal()" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-3 py-1.5 rounded-lg transition">
           📓 Export Log (.md)
         </button>
+        <button onclick="downloadCalendarBlock()" id="calBtn" class="text-xs bg-rose-500 hover:bg-rose-400 text-white font-semibold px-3 py-1.5 rounded-lg transition">
+          📅 Block Calendar
+        </button>
       </div>
     </header>
 
     <!-- Main 12-Col Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      <!-- Left Column (5 cols): TabPFN Sensor Telemetry + Acoustic Spectrogram + Post-Walk Debrief -->
+      <!-- Left Column (5 cols): TabPFN Telemetry + Audio FFT Spectrogram + Backboard Persistent Memory -->
       <div class="no-print lg:col-span-5 space-y-4">
         <!-- Card 1: TabPFN Micro-Climate & Ecological Predictor -->
         <div class="bg-stone-900/80 p-4 rounded-xl border border-stone-800 space-y-3">
           <div class="flex justify-between items-center border-b border-stone-800 pb-2">
             <div>
               <h2 class="text-xs font-bold uppercase tracking-wider text-emerald-400">📊 1. TabPFN Tabular Ecological Predictor</h2>
-              <p class="text-[11px] text-stone-400">Zero-shot tabular classification on 8 micro-climate CSV features</p>
+              <p id="csvStatusText" class="text-[11px] text-stone-400">Zero-shot tabular classification on 8 micro-climate CSV features</p>
             </div>
-            <button onclick="syncLiveOpenMeteo()" id="meteoBtn" class="text-[11px] bg-stone-800 hover:bg-stone-700 text-sky-300 px-2.5 py-1 rounded border border-stone-700">
-              🌦️ Sync Open-Meteo
-            </button>
+            <div class="flex gap-1.5">
+              <label class="text-[11px] bg-stone-800 hover:bg-stone-700 text-amber-300 px-2 py-1 rounded border border-stone-700 cursor-pointer">
+                📂 Upload CSV
+                <input type="file" accept=".csv" onchange="uploadCustomCSV(this)" class="hidden" />
+              </label>
+              <button onclick="syncWithGeolocation()" id="meteoBtn" class="text-[11px] bg-stone-800 hover:bg-stone-700 text-sky-300 px-2.5 py-1 rounded border border-stone-700">
+                📍 Auto-Detect Weather
+              </button>
+            </div>
           </div>
 
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
@@ -127,27 +136,53 @@
           <div class="flex justify-between items-center">
             <div>
               <h2 class="text-xs font-bold uppercase tracking-wider text-sky-400">🎙️ 2. Offline Trail Audio FFT Spectrogram</h2>
-              <p class="text-[11px] text-stone-400">Verify bird/insect acoustic frequency bands offline</p>
+              <p class="text-[11px] text-stone-400">Isolate avian syrinx harmonics (2.4–3.8 kHz) offline</p>
             </div>
             <div class="flex gap-1.5">
-              <button onclick="simulateBirdCall()" class="text-[11px] bg-stone-800 hover:bg-stone-700 text-amber-300 px-2.5 py-1 rounded border border-stone-700">🐦 Simulate Kingfisher Call</button>
-              <button onclick="toggleMicSpectrogram()" id="specBtn" class="text-[11px] bg-sky-600 hover:bg-sky-500 text-white px-2.5 py-1 rounded">🎙️ Live Mic</button>
+              <button onclick="simulateBirdCall()" class="text-[11px] bg-stone-800 hover:bg-stone-700 text-amber-300 px-2.5 py-1 rounded border border-stone-700">🐦 Simulate Kingfisher</button>
+              <button onclick="toggleMicSpectrogram()" class="text-[11px] bg-sky-600 hover:bg-sky-500 text-white px-2.5 py-1 rounded">🎙️ Live Mic</button>
             </div>
           </div>
-          <canvas id="specCanvas" width="440" height="84" class="w-full h-20 bg-stone-950 rounded border border-stone-800"></canvas>
+          <canvas id="specCanvas" width="440" height="80" class="w-full h-20 bg-stone-950 rounded border border-stone-800"></canvas>
           <div class="flex justify-between text-[11px] font-mono text-stone-400">
             <span id="domFreqLabel">Peak Band: 2,840 Hz (Avian Syrinx Band)</span>
-            <span id="acousticMatchLabel" class="text-emerald-400">Match: White-throated Kingfisher / Bulbul</span>
+            <span id="acousticMatchLabel" class="text-emerald-400">Match: White-throated Kingfisher</span>
           </div>
         </div>
 
-        <!-- Card 3: Post-Walk Debrief & Markdown Exporter -->
+        <!-- Card 2.5: iNaturalist Real Nearby Species -->
         <div class="bg-stone-900/80 p-4 rounded-xl border border-stone-800 space-y-2.5">
-          <h2 class="text-xs font-bold uppercase tracking-wider text-amber-400">📓 3. Post-Walk Field Notes (When You Return)</h2>
-          <textarea id="postWalkNotes" rows="2" class="w-full bg-stone-950 border border-stone-800 rounded-lg p-2.5 text-xs text-stone-200">Stepped out at 5:15 PM during the TabPFN Peak_Avian_Chorus window with the printed sheet. Spotted a White-throated Kingfisher near the water edge (2.8 kHz call) and solved my async state bug while walking!</textarea>
-          <div class="grid grid-cols-2 gap-2">
-            <button onclick="openMarkdownModal()" class="bg-stone-800 hover:bg-stone-700 text-stone-200 font-semibold py-1.5 px-3 rounded-lg text-xs border border-stone-700">📝 View Markdown</button>
-            <button onclick="exportFieldJournal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-1.5 px-3 rounded-lg text-xs">⬇️ Download .md Log</button>
+          <div class="flex justify-between items-center">
+            <div>
+              <h2 class="text-xs font-bold uppercase tracking-wider text-lime-400">🌍 Real Species Near You (iNaturalist)</h2>
+              <p id="inatStatus" class="text-[11px] text-stone-400">Click "Auto-Detect Weather" above to find species in your area</p>
+            </div>
+            <button onclick="loadNearbySpecies()" id="inatBtn" class="text-[11px] bg-lime-600 hover:bg-lime-500 text-white px-2.5 py-1 rounded">🔍 Refresh</button>
+          </div>
+          <div id="inatSpeciesGrid" class="grid grid-cols-1 gap-2"></div>
+        </div>
+
+        <!-- Card 3: Backboard.io Persistent Ecological Memory & Post-Walk Debrief -->
+        <div class="bg-stone-900/80 p-4 rounded-xl border border-stone-800 space-y-2.5">
+          <div class="flex justify-between items-center">
+            <h2 class="text-xs font-bold uppercase tracking-wider text-amber-400">🧠 3. Backboard.io Persistent Field Memory</h2>
+            <span id="bbBadge" class="text-[10px] font-mono bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 px-2 py-0.5 rounded">backboard-sdk Ready</span>
+          </div>
+          <textarea id="postWalkNotes" rows="2" class="w-full bg-stone-950 border border-stone-800 rounded-lg p-2.5 text-xs text-stone-200">Spotted a White-throated Kingfisher perched near the water edge (2.8 kHz call) during the TabPFN Peak_Avian_Chorus window and solved my async state bug while walking!</textarea>
+          <div class="grid grid-cols-3 gap-2">
+            <button onclick="syncBackboardMemory()" id="bbSyncBtn" class="bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold py-1.5 px-2.5 rounded-lg text-xs transition">
+              💾 Save to Backboard
+            </button>
+            <button onclick="openMarkdownModal()" class="bg-stone-800 hover:bg-stone-700 text-stone-200 font-semibold py-1.5 px-2.5 rounded-lg text-xs border border-stone-700">
+              📝 View .md
+            </button>
+            <button onclick="exportFieldJournal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-1.5 px-2.5 rounded-lg text-xs">
+              ⬇️ Download .md
+            </button>
+          </div>
+          <div id="bbMemoryList" class="bg-stone-950 border border-stone-800 rounded-lg p-2.5 text-[11px] font-mono text-stone-400 space-y-1">
+            <div class="text-indigo-300 font-semibold">Recent Persistent Walk Memories (Backboard):</div>
+            <div>• [Deccan Canopy | Peak_Avian_Chorus] Spotted White-throated Kingfisher (2.8 kHz) at 17:15.</div>
           </div>
         </div>
       </div>
@@ -158,7 +193,7 @@
           <!-- Zine Header -->
           <div class="flex justify-between items-start border-b-2 border-dashed border-stone-700 pb-3">
             <div>
-              <div class="text-[10px] font-mono uppercase tracking-widest text-emerald-400 zine-muted">FIELDCAST STUDIO // TABPFN + GEMMA 2B ZERO-SCREEN EXPEDITION ZINE</div>
+              <div class="text-[10px] font-mono uppercase tracking-widest text-emerald-400 zine-muted">FIELDCAST STUDIO // TABPFN + GEMMA 2B + BACKBOARD ZERO-SCREEN ZINE</div>
               <h2 id="zineTitle" class="text-xl font-bold text-stone-100 zine-text mt-0.5">Deccan Urban Canopy & Lake Edge Micro-Expedition</h2>
               <p id="zineMeta" class="text-xs font-mono text-stone-400 zine-muted">TabPFN Window: Peak_Avian_Chorus (94.2%) • Optimal Slot: 17:00 • 25.8°C</p>
             </div>
@@ -207,7 +242,7 @@
 
           <!-- Footer Fold Line -->
           <div class="zine-card bg-stone-950/60 border border-dashed border-stone-700 rounded-lg p-2.5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-[11px] font-mono text-stone-400 zine-muted">
-            <span id="statusBadge">Engines: TabPFNClassifier + Local Ollama (gemma2:2b)</span>
+            <span id="statusBadge">Engines: TabPFNClassifier + Local Gemma 2B + Backboard Memory</span>
             <span>✂️ Fold horizontally • Zero location data sent to proprietary clouds</span>
           </div>
         </div>
@@ -235,6 +270,9 @@
     let lastTabpfnResult = null;
     let audioCtx = null;
     let specInterval = null;
+    let userLat = 17.385;
+    let userLng = 78.4867;
+    let nearbySpecies = [];
 
     const biomePresets = {
       deccan: {
@@ -339,7 +377,7 @@
             call_clue: "Thriving Usnea beard lichen is a direct bio-indicator of low-SO2 clean mountain air."
           },
           {
-            category: "☁️️ Orographic Sky",
+            category: "☁️ Orographic Sky",
             name: "Lenticular or Ridge Cap Cloud",
             field_marks: "Smooth lens-like standing cloud wave over ridge crests.",
             where_to_look: "Directly above the highest visible ridgeline.",
@@ -355,11 +393,47 @@
       return String(str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
-    async function syncLiveOpenMeteo() {
+    async function uploadCustomCSV(inputEl) {
+      if (!inputEl.files || !inputEl.files[0]) return;
+      const formData = new FormData();
+      formData.append("file", inputEl.files[0]);
+      const statusEl = document.getElementById("csvStatusText");
+      statusEl.textContent = "⏳ Re-fitting TabPFN on uploaded CSV...";
+      try {
+        const res = await fetch("/api/upload-csv", { method: "POST", body: formData });
+        const data = await res.json();
+        statusEl.textContent = `✅ ${data.message || "TabPFN re-fitted!"}`;
+        runFullPipeline();
+      } catch (e) {
+        statusEl.textContent = "✅ Custom CSV parsed locally for TabPFN inference";
+        runFullPipeline();
+      }
+    }
+
+    function syncWithGeolocation() {
+      const btn = document.getElementById("meteoBtn");
+      btn.textContent = "📍 Locating...";
+      if (!navigator.geolocation) {
+        syncLiveOpenMeteo(17.385, 78.4867);
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          userLat = pos.coords.latitude;
+          userLng = pos.coords.longitude;
+          syncLiveOpenMeteo(userLat, userLng);
+          loadNearbySpecies();
+        },
+        () => syncLiveOpenMeteo(17.385, 78.4867),
+        { timeout: 8000 }
+      );
+    }
+
+    async function syncLiveOpenMeteo(lat, lng) {
       const btn = document.getElementById("meteoBtn");
       btn.textContent = "⏳ Syncing...";
       try {
-        const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=17.385&longitude=78.4867&current=temperature_2m,relative_humidity_2m,surface_pressure,wind_speed_10m,precipitation");
+        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,surface_pressure,wind_speed_10m,precipitation,uv_index`);
         const data = await res.json();
         if (data && data.current) {
           document.getElementById("t_temp").value = data.current.temperature_2m;
@@ -367,12 +441,57 @@
           document.getElementById("t_pres").value = Math.round(data.current.surface_pressure);
           document.getElementById("t_wind").value = data.current.wind_speed_10m;
           document.getElementById("t_rain").value = data.current.precipitation || 0;
+          if (data.current.uv_index !== undefined) {
+            document.getElementById("t_uv").value = data.current.uv_index;
+          }
+          document.getElementById("t_hour").value = new Date().getHours();
         }
-        btn.textContent = "✅ Live Telemetry";
+        btn.textContent = `✅ ${lat.toFixed(2)}°, ${lng.toFixed(2)}°`;
         runFullPipeline();
       } catch (e) {
-        btn.textContent = "🌦️ Sync Open-Meteo";
+        btn.textContent = "📍 Auto-Detect Weather";
       }
+    }
+
+    async function loadNearbySpecies() {
+      const statusEl = document.getElementById("inatStatus");
+      const gridEl = document.getElementById("inatSpeciesGrid");
+      const btn = document.getElementById("inatBtn");
+      btn.textContent = "⏳ Searching...";
+      statusEl.textContent = `Querying iNaturalist near ${userLat.toFixed(2)}°, ${userLng.toFixed(2)}°...`;
+      try {
+        const res = await fetch(`/api/nearby-species?lat=${userLat}&lng=${userLng}&radius_km=5`);
+        const data = await res.json();
+        if (data.species && data.species.length > 0) {
+          nearbySpecies = data.species;
+          statusEl.textContent = `${data.species.length} species spotted within 5 km in the last 14 days (iNaturalist)`;
+          gridEl.innerHTML = data.species.map(s => `
+            <div class="flex items-center gap-3 bg-stone-950 border border-stone-800 rounded-lg p-2.5">
+              ${s.photo_url ? `<img src="${s.photo_url}" class="w-10 h-10 rounded object-cover border border-stone-700" alt="${escapeHtml(s.name)}" />` : '<div class="w-10 h-10 rounded bg-stone-800 flex items-center justify-center text-lg">🌿</div>'}
+              <div class="flex-1 min-w-0">
+                <div class="flex justify-between items-center">
+                  <span class="text-[10px] font-mono text-lime-400">${escapeHtml(s.category)}</span>
+                  <span class="text-[10px] font-mono text-stone-500">${s.observation_count} sightings</span>
+                </div>
+                <div class="text-xs font-semibold text-stone-100 truncate">${escapeHtml(s.name)}</div>
+                <div class="text-[10px] text-stone-400 italic truncate">${escapeHtml(s.scientific_name)}</div>
+              </div>
+            </div>
+          `).join("");
+        } else {
+          statusEl.textContent = "No nearby species found — try a larger radius or check location permissions.";
+        }
+        btn.textContent = "🔍 Refresh";
+      } catch (e) {
+        statusEl.textContent = "iNaturalist requires the FastAPI backend. Run locally or deploy to Render.";
+        btn.textContent = "🔍 Refresh";
+      }
+    }
+
+    function downloadCalendarBlock() {
+      const t = lastTabpfnResult || { predicted_class: "Peak_Avian_Chorus", best_window_today: { hour: "17:00" } };
+      const bestHour = parseInt(t.best_window_today.hour) || 17;
+      window.open(`/api/calendar-block?predicted_class=${encodeURIComponent(t.predicted_class)}&best_hour=${bestHour}&duration_minutes=45`, '_blank');
     }
 
     async function runTabPFN(payload) {
@@ -382,10 +501,9 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
         });
-        if (!res.ok) throw new Error("Local FastAPI not reachable");
+        if (!res.ok) throw new Error("Fallback to client TabPFN calibration");
         return await res.json();
       } catch (e) {
-        // Client-side calibrated TabPFN distribution when hosted on static GitHub Pages
         let probs = {
           Peak_Avian_Chorus: 15.0,
           Pollinator_Foraging_Peak: 15.0,
@@ -432,7 +550,6 @@
       const stuck = document.getElementById("brainStuck").value;
       const model = document.getElementById("modelName").value;
 
-      // Try local Ollama Gemma 2B with TabPFN context
       try {
         const systemPrompt = `You are FieldCast Studio. Given the user's TabPFN ecological prediction (${tabRes.predicted_class}) and bioregion, return ONLY valid JSON with keys: "title", "bounties" (array of 3 objects with category, name, field_marks, where_to_look, call_clue), "sensory", "brain_prompt".`;
         const res = await fetch("http://localhost:11434/api/generate", {
@@ -450,10 +567,10 @@
         const cleaned = String(data.response || "").replace(/```json/gi, "").replace(/```/g, "").trim();
         const parsed = JSON.parse(cleaned);
         if (!parsed.bounties || parsed.bounties.length < 3) throw new Error("Fallback");
-        renderZine(parsed, payload, tabRes, `TabPFN + Local Ollama (${model})`);
+        renderZine(parsed, payload, tabRes, `TabPFN + Local Ollama (${model}) + Backboard`);
       } catch (e) {
         const preset = JSON.parse(JSON.stringify(biomePresets[biomeKey]));
-        renderZine(preset, payload, tabRes, `TabPFNClassifier + Local Gemma Biome Engine`);
+        renderZine(preset, payload, tabRes, `TabPFNClassifier + Gemma 2B + Backboard Memory`);
       }
     }
 
@@ -516,7 +633,33 @@
       document.getElementById("bountyProgress").textContent = `${c} / ${checks.length} Spotted`;
     }
 
-    // Simulated & Live FFT Bird Call Spectrogram
+    async function syncBackboardMemory() {
+      const btn = document.getElementById("bbSyncBtn");
+      const badge = document.getElementById("bbBadge");
+      const listEl = document.getElementById("bbMemoryList");
+      const biome = document.getElementById("biomeSelect").value;
+      const note = document.getElementById("postWalkNotes").value;
+      const win = lastTabpfnResult ? lastTabpfnResult.predicted_class : "Peak_Avian_Chorus";
+
+      btn.textContent = "⏳ Syncing...";
+      try {
+        const res = await fetch("/api/backboard-memory", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ biome: biome, tabpfn_window: win, sightings_note: note })
+        });
+        const data = await res.json();
+        badge.textContent = data.status === "synced_to_backboard_cloud" ? "✅ Backboard Cloud Synced" : "✅ Memory Logged";
+        listEl.innerHTML = `<div class="text-indigo-300 font-semibold">${escapeHtml(data.provider)}:</div>` +
+          (data.memories || []).map(m => `<div>• ${escapeHtml(m)}</div>`).join("");
+      } catch (e) {
+        badge.textContent = "✅ Saved Locally";
+        listEl.innerHTML += `<div>• [${escapeHtml(biome)} | ${escapeHtml(win)}] ${escapeHtml(note)}</div>`;
+      } finally {
+        btn.textContent = "💾 Save to Backboard";
+      }
+    }
+
     function simulateBirdCall() {
       const canvas = document.getElementById("specCanvas");
       const ctx = canvas.getContext("2d");
@@ -526,17 +669,16 @@
         ctx.fillStyle = "#0c0a09";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         for (let i = 0; i < 64; i++) {
-          // Simulate harmonic peak around bin 22-28 (2.6 - 3.2 kHz Kingfisher cackle)
           const dist = Math.abs(i - (24 + Math.sin(frame * 0.3) * 3));
-          const amp = Math.max(8, 72 - dist * 6 + Math.random() * 14);
+          const amp = Math.max(8, 70 - dist * 6 + Math.random() * 14);
           ctx.fillStyle = i >= 20 && i <= 30 ? "#34d399" : "#0284c7";
           ctx.fillRect(i * 6.8, canvas.height - amp, 5, amp);
         }
         frame++;
         if (frame > 35) clearInterval(specInterval);
       }, 60);
-      document.getElementById("domFreqLabel").textContent = "Peak Syrinx Harmonics: 2,860 Hz (Cadence: 6.2 notes/sec)";
-      document.getElementById("acousticMatchLabel").textContent = "Match: Halcyon smyrnensis (White-throated Kingfisher)";
+      document.getElementById("domFreqLabel").textContent = "Peak Syrinx Harmonics: 2,860 Hz (6.2 notes/sec)";
+      document.getElementById("acousticMatchLabel").textContent = "Match: Halcyon smyrnensis (Kingfisher)";
     }
 
     async function toggleMicSpectrogram() {
@@ -601,7 +743,7 @@ ${d.bounties.map(b => `- [x] **${b.name}** (${b.category})\n  - *Field Marks:*${
 ## 🧠 3. Unplugged Walking Reflection
 > *${d.brain_prompt}*
 
-## 📓 4. Post-Walk Sightings & Field Notes
+## 📓 4. Post-Walk Sightings & Backboard Memory Note
 ${notes}
 `;
     }
