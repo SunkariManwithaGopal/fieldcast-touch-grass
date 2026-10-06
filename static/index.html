@@ -53,6 +53,9 @@
         <button onclick="downloadCalendarBlock()" id="calBtn" class="text-xs bg-rose-500 hover:bg-rose-400 text-white font-semibold px-3 py-1.5 rounded-lg transition">
           📅 Block Calendar
         </button>
+        <button onclick="copyPocketCard()" class="text-xs bg-violet-500 hover:bg-violet-400 text-white font-semibold px-3 py-1.5 rounded-lg transition">
+          📋 Copy Pocket Card
+        </button>
       </div>
     </header>
 
@@ -492,6 +495,26 @@
       const t = lastTabpfnResult || { predicted_class: "Peak_Avian_Chorus", best_window_today: { hour: "17:00" } };
       const bestHour = parseInt(t.best_window_today.hour) || 17;
       window.open(`/api/calendar-block?predicted_class=${encodeURIComponent(t.predicted_class)}&best_hour=${bestHour}&duration_minutes=45`, '_blank');
+    }
+
+    function copyPocketCard() {
+      const d = currentZine || biomePresets.deccan;
+      const t = lastTabpfnResult || { predicted_class: "Peak_Avian_Chorus", best_window_today: { hour: "17:00" } };
+      const card = [
+        `🌿 TOUCH GRASS — ${t.best_window_today.hour} — ${t.predicted_class.replace(/_/g, " ")}`,
+        ``,
+        `FIND:`,
+        ...d.bounties.map((b, i) => `${i+1}. ${b.name} → ${b.where_to_look}`),
+        ``,
+        `DO: ${d.sensory.split(".")[0]}.`,
+        ``,
+        `THINK: ${d.brain_prompt.split(".")[0]}.`,
+        ``,
+        `📵 PHONE STAYS AT DESK · 30 MIN`
+      ].join("\n");
+      navigator.clipboard.writeText(card).then(() => {
+        alert("✅ Pocket card copied! Paste it into a sticky note or jot it on a notecard.");
+      });
     }
 
     async function runTabPFN(payload) {
