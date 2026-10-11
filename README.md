@@ -2,94 +2,105 @@
 
 > **A weather window estimator + printable 1-page pocket field zine.**
 
-FieldCast Studio helps developers step away from screens and into nature. It estimates an optimal outdoor window using weather heuristics and TabPFN (locally), formats a 1-page pocket field guide, and encourages leaving your phone at your desk.
+FieldCast Studio helps developers step away from screens and into nature. It evaluates weather conditions to estimate optimal outdoor observation windows, formats a printable 1-page pocket field guide, and encourages leaving your phone at your desk.
 
-![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python&style=for-the-badge)
+![Python](https://img.shields.io/badge/Python-3.11%20%7C%203.12-blue?logo=python&style=for-the-badge)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-green?logo=fastapi&style=for-the-badge)
 ![TabPFN](https://img.shields.io/badge/TabPFN-v2-orange?style=for-the-badge)
 ![Gemma](https://img.shields.io/badge/Gemma-2B-blue?logo=google&style=for-the-badge)
-![GitHub Pages](https://img.shields.io/badge/Hosted-GitHub%20Pages-brightgreen?logo=github&style=for-the-badge)
+![License](https://img.shields.io/badge/License-MIT-brightgreen?style=for-the-badge)
 
 ---
 
-## 🌐 Live Demo vs. Local Execution
+## What Runs Where
 
-- **Live Demo (GitHub Pages):** Runs client-side in your browser. It uses a JavaScript approximation of our weather threshold rules, pre-written regional zine text, and a canvas-animated spectrogram. The "Nearby Wildlife" panel queries live iNaturalist data.
-- **Local Python Environment:** Runs the full FastAPI server with in-context TabPFN v2 inference on weather parameters and local Gemma 2B generation (`gemma2:2b` via Ollama).
+FieldCast Studio has two distinct execution tiers:
+
+| Component | Live Web Demo (GitHub Pages) | Local Python Environment (`app.py`) | Proof / Evidence |
+|---|---|---|---|
+| **Tabular Ecological State Prediction** | **JavaScript Threshold Rules:** Deterministic `if/else` ladder based on hard thresholds (rain ≥ 10mm, humidity ≥ 82%, temp ≥ 34°C, hour ≤ 8 or ≥ 17). | **Prior Labs TabPFN v2:** TabPFNClassifier V2 Apache-2.0 open-weight tabular foundation model fitted in-context on 8 meteorological features. | Saved raw response: [`outputs/tabpfn_raw.json`](outputs/tabpfn_raw.json) |
+| **Field Zine Generation** | **Client-Side Curated Presets:** Hardcoded regional species, sensory prompts, and observation anchors rendered in browser. | **Local Gemma 2B via Ollama:** Calls `gemma2:2b` at `http://127.0.0.1:11434` to dynamically compose structured JSON field guides. | Saved raw response: [`outputs/gemma_raw.json`](outputs/gemma_raw.json) |
+| **24-Hour Forecast** | Browser fetches Open-Meteo hourly weather directly. | Backend proxies Open-Meteo and predicts each hour with TabPFN. | 24-hour evaluation: [`outputs/comparison.csv`](outputs/comparison.csv) |
+| **Persistent Memory** | LocalStorage in browser. | Optional Backboard cloud sync (`backboard-sdk`) with in-memory fallback. | Logged in `app.py` & `render.yaml` |
+| **Nearby Species** | Direct client fetch from iNaturalist Open API (last 14 days research-grade observations within 5 km). | FastAPI endpoint `/api/nearby-species` queries iNaturalist via `httpx`. | iNaturalist API |
+| **Audio FFT Spectrogram** | HTML5 Canvas Web Audio API with offline simulated syrinx band harmonic visualization. | Same frontend canvas widget. | Client-side Canvas |
+| **Field Bounties & QR Code** | Prints QR code encoding an iNaturalist search URL (`https://www.inaturalist.org/search?q={species}`). | Same frontend print template. | Formatted in `index.html` |
 
 ---
 
-## 🛑 The Problem
+## TabPFN vs. JavaScript Rules: Empirical Benchmark
 
-Many of us spend most of our workday in front of screens. When taking an outdoor break, three barriers cause decision fatigue:
+We benchmarked TabPFN v2 against the client-side JavaScript threshold rules extracted from `index.html` across an identical 24-hour Open-Meteo forecast in Hyderabad (`17.385°N, 78.4867°E`, `&timezone=auto` in Asia/Kolkata local time).
 
-1. **When?** — Uncertainty over whether current weather conditions are comfortable.
-2. **What do I do?** — Aimless walks without an observational goal often end quickly.
-3. **How do I unplug?** — Most nature apps require looking at a phone screen outdoors.
+The full dataset is saved in [`outputs/comparison_local_hour.csv`](outputs/comparison_local_hour.csv).
 
-## 🚀 The Solution
+### Summary Statistics
+- **Total Hours Evaluated:** 24 consecutive local hours
+- **Top State Disagreement:** **5 out of 24 hours (20.8%)**
+- **Top State Agreement:** **19 out of 24 hours (79.2%)**
+- **Impact of Pressure Feature (Surface Pressure vs. MSL Pressure):**
+  - Raw surface pressure in Hyderabad (~956 hPa) is outside the training dataset range (`[1002, 1016]` hPa).
+  - When comparing Run 1 (`surface_pressure` ~956 hPa) vs Run 2 (`pressure_msl` ~1012 hPa), the top predicted class changed in **0 out of 24 hours (0.0%)**, though probabilities became sharper with in-distribution MSL pressure.
 
-FieldCast Studio addresses this with a simple workflow: evaluate weather data, print a physical one-page pocket guide, and step outside without your phone.
+### Top Divergent Hours (Real Local Telemetry)
 
-## ✨ Core Features
+1. **Hour 08:00 Local IST (Morning Sun vs Rigid Cutoff)**
+   - **Weather Inputs:** Temp = 27.6°C, Humidity = 49.0%, Wind = 5.8 km/h, UV Index = 2.45, Rain = 0.0 mm
+   - **JS Rule Prediction:** `Peak_Avian_Chorus` (rule allocates 92.4% because `hour <= 8`)
+   - **TabPFN v2 Prediction:** `Pollinator_Foraging_Peak` (68.7% confidence in Run 2; gives 23.4% to Avian Chorus)
+   - **Why they differ:** The hardcoded JS rule uses a rigid `hour <= 8` boundary. TabPFN observes warming ambient conditions and rising solar angle, anticipating the pollinator activity phase.
 
-| Feature | Where It Runs | What It Does |
-|---|---|---|
-| **Weather Window Estimation** | Local (TabPFN) / Demo (JS rules) | Evaluates 7 weather features into 4 outdoor walk states |
-| **24-Hour Timeline** | Browser (Open-Meteo API) | Visualizes state probabilities across the day |
-| **Printable Field Zine** | Local (Gemma 2B) / Demo (Presets) | Formats a `@media print` 1-page foldable guide |
-| **Animated Spectrogram** | Browser (HTML5 Canvas) | Illustrates syrinx harmonics for bird observation |
-| **Nearby Species Panel** | Browser (iNaturalist API) | Shows research-grade sightings within 5 km |
-| **Offline Extras** | Browser | LocalStorage streak tracking and `.ics` calendar exports |
+2. **Hour 11:00 & 13:00 Local IST (Midday Solar Stress)**
+   - **Weather Inputs (13:00):** Temp = 33.4°C, Humidity = 30.0%, Wind = 10.9 km/h, UV Index = 7.7, Rain = 0.0 mm
+   - **JS Rule Prediction:** `Pollinator_Foraging_Peak` (rule threshold for High UV requires UV ≥ 8 or Temp ≥ 34)
+   - **TabPFN v2 Prediction:** `High_UV_AQI_Short_Shade_Walk` (58.0% confidence; gives 24.2% to Pollinator)
+   - **Why they differ:** With UV index 7.7 and 33.4°C, conditions are near the threshold. TabPFN smooths the boundary and flags high solar stress, whereas JS rules fall into midday pollinator foraging.
 
-## 🛠️ Quick Start
+---
 
-### Run Locally
+## 🛠️ Local Setup & Reproduction
 
+### Prerequisites
+- Python 3.11 or Python 3.12 (tested on Python 3.12.7)
+- Ollama with `gemma2:2b`
+
+### 1. Install Dependencies
 ```bash
-# Clone the repo
 git clone https://github.com/SunkariManwithaGopal/fieldcast-touch-grass.git
 cd fieldcast-touch-grass
 
-# Install dependencies
-pip install -r requirements.txt
-
-# Start the server
-uvicorn app:app --reload --port 8000
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+pip install -r requirements.txt requests
 ```
-Open [http://localhost:8000](http://localhost:8000) in your browser.
 
-### Deploy to Render (1-Click)
-
-1. Push this repo to GitHub
-2. Go to [dashboard.render.com](https://dashboard.render.com) → **New +** → **Web Service**
-3. Connect your `fieldcast-touch-grass` repository
-4. Render reads `render.yaml` and auto-deploys in ~2 minutes
-
-### Optional: Local Gemma 2B (Ollama)
-
-For fully offline, private field zine generation:
+### 2. Pull Local Language Model
 ```bash
-# Install Ollama (https://ollama.com)
 ollama pull gemma2:2b
-ollama serve
 ```
-The app will automatically detect Ollama and use Gemma 2B. Without Ollama, it falls back to curated biome presets.
 
-## 🧠 How the AI Models Work Together
+### 3. Start Backend Server
+```bash
+uvicorn app:app --host 127.0.0.1 --port 8000
+```
+Open `http://localhost:8000` in your browser.
 
-### TabPFN (Tabular Data → Probabilities)
-Weather data is fundamentally **tabular numbers**. Asking a text LLM to guess probabilities from CSV rows leads to hallucinated math. TabPFN is a tabular foundation model purpose-built for this: it takes 8 numerical features and outputs calibrated class probabilities with zero hyperparameter tuning.
+---
 
-### Gemma 2B (Probabilities → Natural Language)
-Once TabPFN produces the ecological classification, Gemma 2B translates it into a human-readable, printable field guide with specific species to look for, sensory exercises, and walking meditation prompts. Each model does what it's mathematically built for.
+## Verified Output Artifacts
 
-## 🔓 Why Open Innovation Matters
+Every claim and metric in this repository is backed by locally generated artifacts:
 
-- **Privacy:** Your coordinates and personal reflections never touch a third-party commercial AI server.
-- **Offline-Ready:** Both TabPFN and Gemma 2B run on a standard laptop CPU with zero internet needed.
-- **Zero Cost:** No API keys, no token billing, no vendor lock-in.
-- **Customizable:** Upload your own CSV dataset and TabPFN re-fits in-context instantly.
+| Output File | Description |
+|---|---|
+| [`outputs/tabpfn_raw.json`](outputs/tabpfn_raw.json) | Live response from `/api/tabpfn-predict` running Prior Labs TabPFN v2. |
+| [`outputs/gemma_raw.json`](outputs/gemma_raw.json) | Live response from `/api/generate-zine` invoking local `gemma2:2b`. |
+| [`outputs/comparison.csv`](outputs/comparison.csv) | Full 24-hour table comparing JS rules vs TabPFN probabilities. |
+| [`outputs/comparison_local_hour.csv`](outputs/comparison_local_hour.csv) | Dual 24-hour comparison using true local hours (surface pressure vs MSL pressure). |
+| [`outputs/facts_search.txt`](outputs/facts_search.txt) | Exact file and line occurrences for all audit keywords. |
+
+---
 
 ## License
+
 MIT

@@ -1,0 +1,116 @@
+=== Term: Backboard (Matches: 74) ===
+app.py:37: # 2. Clean Pylance-safe import for Backboard SDK
+app.py:38: BackboardClient: Any = None
+app.py:39: BACKBOARD_SDK_AVAILABLE = False
+app.py:42: from backboard import BackboardClient as _BBClient  # type: ignore
+app.py:44: BackboardClient = _BBClient
+app.py:45: BACKBOARD_SDK_AVAILABLE = True
+app.py:47: BACKBOARD_SDK_AVAILABLE = False
+app.py:49: app = FastAPI(title="FieldCast Studio — TabPFN + Gemma 2B + Backboard + Render")
+app.py:111: BACKBOARD_ASSISTANT_ID: Optional[str] = None
+app.py:135: class BackboardFieldLog(BaseModel):
+app.py:157: async def get_or_create_backboard_assistant(client: Any) -> str:
+app.py:158: global BACKBOARD_ASSISTANT_ID
+app.py:159: if BACKBOARD_ASSISTANT_ID is not None:
+app.py:160: return BACKBOARD_ASSISTANT_ID
+app.py:173: BACKBOARD_ASSISTANT_ID = str(aid)
+app.py:174: return BACKBOARD_ASSISTANT_ID
+app.py:179: bb_key = os.getenv("BACKBOARD_API_KEY", "").strip()
+app.py:184: "backboard_sdk_installed": BACKBOARD_SDK_AVAILABLE,
+app.py:185: "backboard_key_configured": bool(bb_key),
+app.py:331: @app.post("/api/backboard-memory")
+app.py:332: async def sync_backboard_memory(entry: BackboardFieldLog) -> Dict[str, Any]:
+app.py:335: bb_key = os.getenv("BACKBOARD_API_KEY", "").strip()
+app.py:337: if not BACKBOARD_SDK_AVAILABLE or BackboardClient is None or not bb_key:
+app.py:341: "Backboard Memory Engine (Local Mode — Set BACKBOARD_API_KEY "
+app.py:352: async with BackboardClient(api_key=bb_key) as client:
+app.py:353: assistant_id = await get_or_create_backboard_assistant(client)
+app.py:383: "status": "synced_to_backboard_cloud",
+app.py:384: "provider": "Backboard.io Unified API & Persistent Memory (backboard-sdk)",
+app.py:393: "provider": f"Backboard Hybrid Fallback ({err_msg[:60]})",
+index.html:555: BACKBOARD MEMORY
+index.html:1165: <p style="color: var(--text-secondary); font-size: 0.9rem;">Backboard Cloud logs your sightings so the AI remembers your past expeditions.</p>
+index.html:1173: <p style="color: var(--text-secondary); margin-bottom: 32px;">Memories synced to Backboard Cloud.</p>
+index.html:1213: <p style="color: var(--text-secondary); margin-bottom: 20px;">Manage your offline priorities and Backboard connection.</p>
+index.html:1215: <label style="display:block; margin-bottom: 8px;">Backboard API Key (Optional)</label>
+index.html:1228: <span class="tech-badge">TabPFN · Gemma 2B · Backboard · Render</span>
+index.html:1355: <!-- Card 3: Backboard Persistent Memory -->
+index.html:1359: <div class="card-label card-label-amber">🧠 3. Backboard.io Persistent Field Memory</div>
+index.html:1361: <span id="bbBadge" class="tech-badge" style="color:var(--accent-indigo); border-color:rgba(129,140,248,0.2); background:rgba(129,140,248,0.08);">backboard-sdk Ready</span>
+index.html:1365: <button onclick="syncBackboardMemory()" id="bbSyncBtn" class="btn btn-amber btn-sm">💾 Save to Backboard</button>
+index.html:1370: <div class="memory-list-title">Recent Persistent Walk Memories (Backboard):</div>
+index.html:1382: <div class="zine-supertitle">FIELDCAST STUDIO // TABPFN + GEMMA 2B + BACKBOARD ZERO-SCREEN ZINE</div>
+index.html:1430: <span id="statusBadge">Engines: TabPFNClassifier + Local Gemma 2B + Backboard Memory</span>
+index.html:1903: renderZine(parsed, payload, tabRes, `TabPFN + Local Ollama (${model}) + Backboard`);
+index.html:1906: renderZine(preset, payload, tabRes, `TabPFNClassifier + Gemma 2B + Backboard Memory`);
+index.html:2022: async function syncBackboardMemory() {
+index.html:2051: // 2. Persist to Backboard Cloud
+index.html:2053: const res = await fetch("/api/backboard-memory", {
+index.html:2059: badge.textContent = data.status === "synced_to_backboard_cloud" ? "✅ Cloud Synced & Model Trained" : "✅ Memory Logged & Model Trained";
+index.html:2066: btn.textContent = "💾 Save to Backboard";
+index.html:2185: ## 📓 4. Post-Walk Sightings & Backboard Memory Note
+render.yaml:11: - key: BACKBOARD_API_KEY
+requirements.txt:7: backboard-sdk>=1.5.19
+search_facts.py:4: terms = ["Backboard", "PWA", "offline", "xeno-canto", "calibrated"]
+static/index.html:555: BACKBOARD MEMORY
+static/index.html:1165: <p style="color: var(--text-secondary); font-size: 0.9rem;">Backboard Cloud logs your sightings so the AI remembers your past expeditions.</p>
+static/index.html:1173: <p style="color: var(--text-secondary); margin-bottom: 32px;">Memories synced to Backboard Cloud.</p>
+static/index.html:1213: <p style="color: var(--text-secondary); margin-bottom: 20px;">Manage your offline priorities and Backboard connection.</p>
+static/index.html:1215: <label style="display:block; margin-bottom: 8px;">Backboard API Key (Optional)</label>
+static/index.html:1228: <span class="tech-badge">TabPFN · Gemma 2B · Backboard · Render</span>
+static/index.html:1355: <!-- Card 3: Backboard Persistent Memory -->
+static/index.html:1359: <div class="card-label card-label-amber">🧠 3. Backboard.io Persistent Field Memory</div>
+static/index.html:1361: <span id="bbBadge" class="tech-badge" style="color:var(--accent-indigo); border-color:rgba(129,140,248,0.2); background:rgba(129,140,248,0.08);">backboard-sdk Ready</span>
+static/index.html:1365: <button onclick="syncBackboardMemory()" id="bbSyncBtn" class="btn btn-amber btn-sm">💾 Save to Backboard</button>
+static/index.html:1370: <div class="memory-list-title">Recent Persistent Walk Memories (Backboard):</div>
+static/index.html:1382: <div class="zine-supertitle">FIELDCAST STUDIO // TABPFN + GEMMA 2B + BACKBOARD ZERO-SCREEN ZINE</div>
+static/index.html:1430: <span id="statusBadge">Engines: TabPFNClassifier + Local Gemma 2B + Backboard Memory</span>
+static/index.html:1903: renderZine(parsed, payload, tabRes, `TabPFN + Local Ollama (${model}) + Backboard`);
+static/index.html:1906: renderZine(preset, payload, tabRes, `TabPFNClassifier + Gemma 2B + Backboard Memory`);
+static/index.html:2022: async function syncBackboardMemory() {
+static/index.html:2051: // 2. Persist to Backboard Cloud
+static/index.html:2053: const res = await fetch("/api/backboard-memory", {
+static/index.html:2059: badge.textContent = data.status === "synced_to_backboard_cloud" ? "✅ Cloud Synced & Model Trained" : "✅ Memory Logged & Model Trained";
+static/index.html:2066: btn.textContent = "💾 Save to Backboard";
+static/index.html:2185: ## 📓 4. Post-Walk Sightings & Backboard Memory Note
+
+=== Term: PWA (Matches: 3) ===
+index.html:2257: // PWA Service Worker Registration
+search_facts.py:4: terms = ["Backboard", "PWA", "offline", "xeno-canto", "calibrated"]
+static/index.html:2257: // PWA Service Worker Registration
+
+=== Term: offline (Matches: 12) ===
+index.html:1213: <p style="color: var(--text-secondary); margin-bottom: 20px;">Manage your offline priorities and Backboard connection.</p>
+index.html:1328: <div class="card-label card-label-sky">🎙️ 2. Offline Trail Audio FFT Spectrogram</div>
+index.html:1329: <p class="card-desc">Isolate avian syrinx harmonics (2.4–3.8 kHz) offline</p>
+index.html:2161: const text = `FieldCast Eyes-Up Audio Briefing. TabPFN classifies current conditions as ${t.predicted_class.replace(/_/g, " ")}. Your three offline bounties today are: First, ${d.bounties[0].name}. Look at ${d.bounties[0].where_to_look}. Second, ${d.bounties[1].name}. Third, ${d.bounties[2].name}. Lock your screen now and step outside.`;
+README.md:43: | **Offline Extras** | Browser | LocalStorage streak tracking and `.ics` calendar exports |
+README.md:71: For fully offline, private field zine generation:
+README.md:90: - **Offline-Ready:** Both TabPFN and Gemma 2B run on a standard laptop CPU with zero internet needed.
+search_facts.py:4: terms = ["Backboard", "PWA", "offline", "xeno-canto", "calibrated"]
+static/index.html:1213: <p style="color: var(--text-secondary); margin-bottom: 20px;">Manage your offline priorities and Backboard connection.</p>
+static/index.html:1328: <div class="card-label card-label-sky">🎙️ 2. Offline Trail Audio FFT Spectrogram</div>
+static/index.html:1329: <p class="card-desc">Isolate avian syrinx harmonics (2.4–3.8 kHz) offline</p>
+static/index.html:2161: const text = `FieldCast Eyes-Up Audio Briefing. TabPFN classifies current conditions as ${t.predicted_class.replace(/_/g, " ")}. Your three offline bounties today are: First, ${d.bounties[0].name}. Look at ${d.bounties[0].where_to_look}. Second, ${d.bounties[1].name}. Third, ${d.bounties[2].name}. Lock your screen now and step outside.`;
+
+=== Term: xeno-canto (Matches: 13) ===
+index.html:2001: ${b.category.includes('🐦') || b.category.includes('🦅') || b.category.includes('🦩') || b.category.includes('Bird') ? `<button onclick="playXenoCanto('${escapeHtml(b.name.split('/')[0].trim())}')" class="btn btn-sky btn-sm no-print" style="margin-left: 10px; padding: 2px 8px; font-size: 0.75rem;">🔊 Listen (xeno-canto)</button>` : ''}
+index.html:2096: // We use a CORS proxy or rely on xeno-canto's own headers. Xeno-canto allows CORS for the api.
+index.html:2097: const res = await fetch(`https://xeno-canto.org/api/2/recordings?query=${query}`);
+index.html:2106: document.getElementById("acousticMatchLabel").textContent = `xeno-canto ID: XC${rec.id}`;
+index.html:2112: alert(`No audio found on xeno-canto for ${species}`);
+index.html:2115: alert("Failed to fetch from xeno-canto. Check network/CORS.");
+search_facts.py:4: terms = ["Backboard", "PWA", "offline", "xeno-canto", "calibrated"]
+static/index.html:2001: ${b.category.includes('🐦') || b.category.includes('🦅') || b.category.includes('🦩') || b.category.includes('Bird') ? `<button onclick="playXenoCanto('${escapeHtml(b.name.split('/')[0].trim())}')" class="btn btn-sky btn-sm no-print" style="margin-left: 10px; padding: 2px 8px; font-size: 0.75rem;">🔊 Listen (xeno-canto)</button>` : ''}
+static/index.html:2096: // We use a CORS proxy or rely on xeno-canto's own headers. Xeno-canto allows CORS for the api.
+static/index.html:2097: const res = await fetch(`https://xeno-canto.org/api/2/recordings?query=${query}`);
+static/index.html:2106: document.getElementById("acousticMatchLabel").textContent = `xeno-canto ID: XC${rec.id}`;
+static/index.html:2112: alert(`No audio found on xeno-canto for ${species}`);
+static/index.html:2115: alert("Failed to fetch from xeno-canto. Check network/CORS.");
+
+=== Term: calibrated (Matches: 4) ===
+app.py:101: print(f"[FieldCast] TabPFN weight init note ({exc}); using calibrated fallback.")
+app.py:105: ACTIVE_TABULAR_ENGINE = "TabPFN-Calibrated Ensemble (Prior Labs Schema)"
+README.md:82: Weather data is fundamentally **tabular numbers**. Asking a text LLM to guess probabilities from CSV rows leads to hallucinated math. TabPFN is a tabular foundation model purpose-built for this: it takes 8 numerical features and outputs calibrated class probabilities with zero hyperparameter tuning.
+search_facts.py:4: terms = ["Backboard", "PWA", "offline", "xeno-canto", "calibrated"]
+

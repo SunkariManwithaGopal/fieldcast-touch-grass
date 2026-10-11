@@ -177,9 +177,10 @@ async def get_or_create_backboard_assistant(client: Any) -> str:
 @app.get("/api/health")
 def health_check() -> Dict[str, Any]:
     bb_key = os.getenv("BACKBOARD_API_KEY", "").strip()
+    runtime_env = "Render Cloud Web Service" if os.getenv("RENDER") else "Local Python Environment"
     return {
         "status": "online",
-        "runtime": "Render Cloud Web Service",
+        "runtime": runtime_env,
         "tabular_engine": ACTIVE_TABULAR_ENGINE,
         "backboard_sdk_installed": BACKBOARD_SDK_AVAILABLE,
         "backboard_key_configured": bool(bb_key),
@@ -258,8 +259,13 @@ def predict_ecological_window(data: TelemetryInput) -> Dict[str, Any]:
 
     best_slot = max(hourly_forecast, key=lambda x: float(x["score"]))
 
+    engine_identifier = (
+        "tabpfn_v2" if type(clf).__name__ == "TabPFNClassifier" else "fallback_random_forest"
+    )
+
     return {
         "engine": ACTIVE_TABULAR_ENGINE,
+        "engine_used": engine_identifier,
         "training_rows": len(df_history),
         "predicted_class": top_class,
         "confidence_pct": prob_map[top_class],
