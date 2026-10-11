@@ -1688,12 +1688,40 @@
       btn.textContent = "⏳ Searching...";
       statusEl.textContent = `Querying iNaturalist near ${userLat.toFixed(2)}°, ${userLng.toFixed(2)}°...`;
       try {
-        const res = await fetch(`/api/nearby-species?lat=${userLat}&lng=${userLng}&radius_km=5`);
-        const data = await res.json();
-        if (data.species && data.species.length > 0) {
-          nearbySpecies = data.species;
-          statusEl.textContent = `${data.species.length} species spotted within 5 km in the last 14 days (iNaturalist)`;
-          gridEl.innerHTML = data.species.map(s => `
+        let speciesList = [];
+        try {
+          const res = await fetch(`/api/nearby-species?lat=${userLat}&lng=${userLng}&radius_km=5`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.species && data.species.length > 0) speciesList = data.species;
+          }
+        } catch (_) {}
+
+        // Direct client fallback to iNaturalist Open API if backend is unavailable (e.g. GitHub Pages)
+        if (!speciesList || speciesList.length === 0) {
+          const inatRes = await fetch(`https://api.inaturalist.org/v1/observations/species_counts?lat=${userLat}&lng=${userLng}&radius=5&iconic_taxa=Aves,Plantae,Insecta&quality_grade=research&per_page=9`);
+          if (inatRes.ok) {
+            const inatData = await inatRes.json();
+            const taxaMap = { Aves: "🐦 Bird", Plantae: "🌳 Plant", Insecta: "🦋 Insect" };
+            speciesList = (inatData.results || []).slice(0, 6).map(r => {
+              const t = r.taxon || {};
+              const cat = taxaMap[t.iconic_taxon_name] || "🌿 Wildlife";
+              return {
+                category: cat,
+                name: t.preferred_common_name || t.name || "Unknown Species",
+                scientific_name: t.name || "",
+                observation_count: r.count || 1,
+                photo_url: t.default_photo ? t.default_photo.medium_url : "",
+                wikipedia_url: t.wikipedia_url || ""
+              };
+            });
+          }
+        }
+
+        if (speciesList.length > 0) {
+          nearbySpecies = speciesList;
+          statusEl.textContent = `${speciesList.length} species spotted within 5 km in the last 14 days (iNaturalist)`;
+          gridEl.innerHTML = speciesList.map(s => `
             <div class="species-item">
               ${s.photo_url ? `<img src="${s.photo_url}" class="species-img" alt="${escapeHtml(s.name)}" />` : '<div class="species-placeholder">🌿</div>'}
               <div class="species-info">
@@ -1711,7 +1739,7 @@
         }
         btn.textContent = "🔍 Refresh";
       } catch (e) {
-        statusEl.textContent = "iNaturalist requires the FastAPI backend. Run locally or deploy to Render.";
+        statusEl.textContent = "Could not load iNaturalist data. Check internet connection.";
         btn.textContent = "🔍 Refresh";
       }
     }
@@ -1719,7 +1747,46 @@
     function downloadCalendarBlock() {
       const t = lastTabpfnResult || { predicted_class: "Peak_Avian_Chorus", best_window_today: { hour: "17:00" } };
       const bestHour = parseInt(t.best_window_today.hour) || 17;
-      window.open(`/api/calendar-block?predicted_class=${encodeURIComponent(t.predicted_class)}&best_hour=${bestHour}&duration_minutes=45`, '_blank');
+      const durationMinutes = 45;
+      const eventName = (t.predicted_class || "Peak_Avian_Chorus").replace(/_/g, " ");
+
+      const now = new Date();
+      const start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), bestHour, 0, 0);
+      if (start < now) start.setDate(start.getDate() + 1);
+      const end = new Date(start.getTime() + durationMinutes * 60000);
+
+      const fmt = d => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+      const uid = 'fieldcast-' + Date.now() + '@fieldcast-studio';
+
+      const ics = [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "PRODID:-//FieldCast Studio//Touch Grass//EN",
+        "BEGIN:VEVENT",
+        `UID:${uid}`,
+        `DTSTART:${fmt(start)}`,
+        `DTEND:${fmt(end)}`,
+        `SUMMARY:🌿 Touch Grass — ${eventName}`,
+        `DESCRIPTION:FieldCast Studio predicted this as your optimal outdoor window (${eventName}). Leave your phone at your desk and take the printed field zine outside for ${durationMinutes} minutes.`,
+        "STATUS:CONFIRMED",
+        "BEGIN:VALARM",
+        "TRIGGER:-PT10M",
+        "ACTION:DISPLAY",
+        "DESCRIPTION:🌿 Your Touch Grass window starts in 10 minutes! Print your field zine now.",
+        "END:VALARM",
+        "END:VEVENT",
+        "END:VCALENDAR"
+      ].join("\r\n");
+
+      const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `TouchGrass-${t.predicted_class}.ics`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     }
 
     function copyPocketCard() {
