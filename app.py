@@ -137,11 +137,21 @@ class BackboardFieldLog(BaseModel):
     tabpfn_window: str
     sightings_note: str
 
+class LearnInput(BaseModel):
+    temp_c: float
+    humidity_pct: float
+    wind_kmh: float
+    uv_index: float
+    aqi: float
+    pressure_hpa: float
+    rain_24h_mm: float
+    hour_of_day: int
+    true_class: str
+
+
 
 def dump_model(model_obj: BaseModel) -> Dict[str, Any]:
-    if hasattr(model_obj, "model_dump"):
-        return model_obj.model_dump()  # type: ignore
-    return model_obj.dict()  # type: ignore
+    return model_obj.model_dump()
 
 
 async def get_or_create_backboard_assistant(client: Any) -> str:
@@ -281,6 +291,41 @@ async def upload_custom_csv(file: UploadFile = File(...)) -> Dict[str, Any]:
         "message": f"TabPFN re-fitted in-context on {len(df_history)} rows!",
         "rows": len(df_history),
     }
+
+
+@app.post("/api/tabpfn-learn")
+def tabpfn_learn(entry: LearnInput) -> Dict[str, Any]:
+    """In-Context Learning: Appends observation to dataset and refits TabPFN instantly."""
+    global df_history, clf, X_train, y_train
+    new_row = pd.DataFrame([{
+        "temp_c": entry.temp_c,
+        "humidity_pct": entry.humidity_pct,
+        "wind_kmh": entry.wind_kmh,
+        "uv_index": entry.uv_index,
+        "aqi": entry.aqi,
+        "pressure_hpa": entry.pressure_hpa,
+        "rain_24h_mm": entry.rain_24h_mm,
+        "hour_of_day": entry.hour_of_day,
+        TARGET_COL: entry.true_class,
+    }])
+    df_history = pd.concat([df_history, new_row], ignore_index=True)
+    
+    # Save back to CSV to persist memory across server restarts
+    try:
+        df_history.to_csv(CSV_PATH, index=False)
+    except Exception as e:
+        print(f"Warning: Could not save CSV: {e}")
+
+    X_train = df_history[FEATURE_COLS].to_numpy()
+    y_train = df_history[TARGET_COL].to_numpy()
+    clf = init_tabular_model(X_train, y_train)
+    
+    return {
+        "status": "success",
+        "message": f"TabPFN re-fitted in-context with {len(df_history)} rows",
+        "rows": len(df_history)
+    }
+
 
 
 @app.post("/api/backboard-memory")
@@ -462,6 +507,104 @@ def generate_calendar_block(
         media_type="text/calendar",
         filename=f"TouchGrass-{predicted_class}-{start.strftime('%Y%m%d')}.ics",
     )
+
+
+@app.get("/api/ecological-forecast")
+async def ecological_forecast(lat: float, lng: float) -> Dict[str, Any]:
+    """Fetches 24h hourly weather from Open-Meteo and runs TabPFN on each hour."""
+    if not HTTPX_AVAILABLE:
+        return {"status": "error", "message": "httpx not installed"}
+
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            url = (
+                f"https://api.open-meteo.com/v1/forecast"
+                f"?latitude={lat}&longitude={lng}"
+                f"&hourly=temperature_2m,relative_humidity_2m,surface_pressure,wind_speed_10m,precipitation,uv_index"
+                f"&forecast_days=2"
+            )
+            resp = await client.get(url)
+            if resp.status_code != 200:
+                return {"status": "error", "message": "Weather API failed"}
+            
+            data = resp.json()
+            hourly = data.get("hourly", {})
+            times = hourly.get("time", [])
+            
+            # Get current time index
+            now = datetime.now(timezone.utc)
+            start_idx = 0
+            for i, t in enumerate(times):
+                if datetime.fromisoformat(t).replace(tzinfo=timezone.utc) >= now:
+                    start_idx = i
+                    break
+            
+            # Predict for next 24 hours
+            forecast_results = []
+            for i in range(start_idx, min(start_idx + 24, len(times))):
+                hr = datetime.fromisoformat(times[i]).hour
+                x_hr = np.array([[
+                    hourly.get("temperature_2m", [])[i],
+                    hourly.get("relative_humidity_2m", [])[i],
+                    hourly.get("wind_speed_10m", [])[i],
+                    hourly.get("uv_index", [])[i] or 0.0,
+                    40.0, # Default AQI
+                    hourly.get("surface_pressure", [])[i],
+                    hourly.get("precipitation", [])[i],
+                    hr
+                ]])
+                
+                p_hr = clf.predict_proba(x_hr)[0]
+                class_labels = [str(c) for c in list(clf.classes_)]
+                hr_map: Dict[str, float] = {label: float(p) for label, p in zip(class_labels, p_hr)}
+                
+                outdoor_score = round(
+                    (hr_map.get("Peak_Avian_Chorus", 0.0) * 1.0 +
+                     hr_map.get("Post_Rain_Canopy_Emergence", 0.0) * 0.95 +
+                     hr_map.get("Pollinator_Foraging_Peak", 0.0) * 0.85) * 100.0, 1
+                )
+                
+                dominant_state = max(hr_map, key=lambda k: hr_map[k])
+                
+                forecast_results.append({
+                    "hour": f"{hr:02d}:00",
+                    "time_iso": times[i],
+                    "score": outdoor_score,
+                    "dominant_state": dominant_state,
+                    "probabilities": hr_map
+                })
+
+            return {
+                "status": "success",
+                "lat": lat,
+                "lng": lng,
+                "forecast": forecast_results
+            }
+    except Exception as exc:
+        return {"status": "error", "message": str(exc)}
+
+class ZineGenerateRequest(BaseModel):
+    model: str
+    system: str
+    prompt: str
+    format: str = "json"
+    stream: bool = False
+
+@app.post("/api/generate-zine")
+async def generate_zine(req: ZineGenerateRequest) -> Dict[str, Any]:
+    """Proxies the request to Ollama so the frontend doesn't need to know the host IP."""
+    if not HTTPX_AVAILABLE:
+        raise HTTPException(status_code=500, detail="httpx not installed")
+    
+    ollama_url = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434")
+    try:
+        async with httpx.AsyncClient(timeout=45.0) as client:
+            resp = await client.post(f"{ollama_url}/api/generate", json=req.model_dump())
+            resp.raise_for_status()
+            return resp.json()
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Ollama generation failed: {exc}")
+
 
 
 if os.path.isdir(STATIC_DIR):
