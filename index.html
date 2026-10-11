@@ -4,9 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
   <title>FieldCast Studio — AI-Powered Ecological Window Predictor</title>
-  <meta name="description" content="FieldCast Studio uses open-weight AI (TabPFN + Gemma 2B) to predict the best time to go outside, prints a 1-page field zine, and remembers your nature sightings." />
+  <meta name="description" content="Check a weather window for a nature walk and print a one-page pocket field zine. The live demo uses rules; the local backend can run TabPFN and Gemma." />
   <meta property="og:title" content="FieldCast Studio — Touch Grass with Open-Source AI" />
-  <meta property="og:description" content="TabPFN predicts your optimal ecological window. Gemma 2B generates a printable field zine. Leave your phone. Walk outside." />
+  <meta property="og:description" content="Check a weather window and print a pocket field zine. Live demo uses rules; local backend runs TabPFN and Gemma." />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>" />
@@ -1139,7 +1139,7 @@
         </div>
         <h1 style="font-size: 3.5rem; margin-bottom: 24px; font-weight: 900; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Leave your phone.<br/>Walk outside.</h1>
         <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto 40px; font-size: 1.15rem; line-height: 1.6;">
-          FieldCast Studio uses TabPFN to predict the best time for a walk, and Gemma 2B to generate a printable 1-page field zine. Unplug and explore.
+          FieldCast Studio estimates outdoor weather windows and formats a printable 1-page field zine. The live demo uses client-side rules; TabPFN and Gemma run only in the local Python backend.
         </p>
         
         <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
@@ -1153,12 +1153,12 @@
       <div class="card" style="text-align:center; padding: 30px 20px;">
         <div style="font-size: 2.5rem; margin-bottom: 16px;">📊</div>
         <h3 style="margin-bottom: 12px; color: var(--accent-sky);">AI Prediction</h3>
-        <p style="color: var(--text-secondary); font-size: 0.9rem;">TabPFN analyzes 8 micro-climate variables to find your optimal outdoor window.</p>
+        <p style="color: var(--text-secondary); font-size: 0.9rem;">Live demo uses threshold rules; local backend runs Prior Labs TabPFN foundation model across 8 micro-climate variables.</p>
       </div>
       <div class="card" style="text-align:center; padding: 30px 20px;">
         <div style="font-size: 2.5rem; margin-bottom: 16px;">🖨️</div>
         <h3 style="margin-bottom: 12px; color: var(--accent-amber);">Printable Zine</h3>
-        <p style="color: var(--text-secondary); font-size: 0.9rem;">Gemma 2B generates a custom 1-page field guide to take outside without a screen.</p>
+        <p style="color: var(--text-secondary); font-size: 0.9rem;">Live demo formats curated regional presets; local backend runs Gemma 2B via Ollama to compose field guides.</p>
       </div>
       <div class="card" style="text-align:center; padding: 30px 20px;">
         <div style="font-size: 2.5rem; margin-bottom: 16px;">📓</div>
@@ -1310,7 +1310,7 @@
               <option value="coastal">Coastal Estuary & Mangrove Boardwalk</option>
               <option value="montane">Montane Pine Ridge & Cloud Trail</option>
             </select>
-            <input id="brainStuck" type="text" value="Debugging an async race condition & need an eyes-up reset" placeholder="What screen task are you unplugging from?" />
+            <input id="brainStuck" type="text" value="Taking a break from screens to observe the local tree canopy" placeholder="What outdoor observation are you focusing on?" />
           </div>
 
           <div style="display: flex; gap: 10px; margin-top: 12px;">
@@ -1321,7 +1321,7 @@
               📖 Generate Field Zine
             </button>
           </div>
-          <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 6px; text-align: center;">
+          <p id="modelLoadingNote" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 6px; text-align: center; display: none;">
             First request can take about a minute while models load.
           </p>
 
@@ -1342,8 +1342,8 @@
           </div>
           <canvas id="specCanvas" width="440" height="80" class="spec-canvas"></canvas>
           <div class="spec-info">
-            <span class="freq" id="domFreqLabel">Simulated Band: 2,840 Hz (Syrinx Band)</span>
-            <span class="match" id="acousticMatchLabel">Display: Simulated Audio Pattern</span>
+            <span class="freq" id="domFreqLabel">Simulated audio pattern (decorative animation)</span>
+            <span class="match" id="acousticMatchLabel">Simulated pattern (not a measurement)</span>
           </div>
         </div>
 
@@ -1911,14 +1911,21 @@
       const model = document.getElementById("modelName").value;
 
       try {
-        const systemPrompt = `You are FieldCast Studio. Given the user's TabPFN ecological prediction (${tabRes.predicted_class}) and bioregion, return ONLY valid JSON with keys: "title", "bounties" (array of 3 objects with category, name, field_marks, where_to_look, call_clue), "sensory", "brain_prompt".`;
+        const systemPrompt = `You are FieldCast Studio, an outdoor observation guide for nature walks. Focus purely on natural history, sensory awareness, and mindful outdoor exploration. Do not discuss computer code, debugging, or technical software topics. Return ONLY valid JSON with keys "title", "sensory", "brain_prompt". Example:
+{
+  "title": "Evening Canopy & Tree-Crown Walk",
+  "sensory": "Notice the slant of late afternoon sunlight filtering through branches. Listen for rustling in the dry leaves and overlapping bird calls overhead.",
+  "brain_prompt": "As you walk, count three different shades of green in the foliage and notice how shadows lengthen across the path."
+}`;
+        const userPrompt = `Biome: ${biomeKey}, Ecological State: ${tabRes.predicted_class}, Temperature: ${payload.temp_c}°C. Walk Focus: ${stuck}`;
+
         const res = await fetch("/api/generate-zine", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             model: model,
             system: systemPrompt,
-            prompt: `Biome: ${biomeKey}, TabPFN State: ${tabRes.predicted_class}, Temp: ${payload.temp_c}C, Stuck Problem: ${stuck}`,
+            prompt: userPrompt,
             format: "json",
             stream: false
           })
@@ -1956,7 +1963,7 @@
       box.innerHTML = `
         <div class="tabpfn-header">
           <span class="tabpfn-class">${engineTitle}</span>
-          <span class="tabpfn-slot">${isTabPFN ? `Best Slot: ${tabRes.best_window_today.hour}` : `Best slot: not computed in the live demo`}</span>
+          <span class="tabpfn-slot">${isTabPFN ? `Best Slot: ${tabRes.best_window_today.hour} (highest bird-chorus score for current conditions among tested hours (not a forecast))` : `Best slot: not computed in the live demo`}</span>
         </div>
         <div style="font-size: 0.72rem; color: var(--text-secondary); margin-bottom: 8px;">${subtitle}</div>
         ${bars}
@@ -2022,7 +2029,7 @@
       document.getElementById("zineTitle").textContent = zine.title;
       document.getElementById("zineMeta").textContent = `${engineLabel} Class: ${tabRes.predicted_class} (${confText}) • ${payload.temp_c}°C, RH ${payload.humidity_pct}%, AQI ${payload.aqi}`;
       document.getElementById("zineTabpfnSummary").textContent = `${engineLabel} Assessment: ${tabRes.predicted_class} (${confText}) from micro-climate telemetry features.`;
-      document.getElementById("zineBestSlot").textContent = isTabPFN ? `Peak Window: ${tabRes.best_window_today.hour} (${tabRes.best_window_today.score}/100)` : `Best slot: not computed in the live demo`;
+      document.getElementById("zineBestSlot").textContent = isTabPFN ? `Peak Window: ${tabRes.best_window_today.hour} (${tabRes.best_window_today.score}/100) — highest bird-chorus score for current conditions among tested hours (not a forecast)` : `Best slot: not computed in the live demo`;
       document.getElementById("zineSensory").textContent = zine.sensory;
       document.getElementById("zineBrainPrompt").textContent = zine.brain_prompt;
       document.getElementById("statusBadge").textContent = `Engines: ${source}`;
@@ -2148,8 +2155,8 @@
         frame++;
         if (frame > 35) clearInterval(specInterval);
       }, 60);
-      document.getElementById("domFreqLabel").textContent = "Peak Syrinx Harmonics: 2,860 Hz (6.2 notes/sec)";
-      document.getElementById("acousticMatchLabel").textContent = "Live frequency view (no species ID)";
+      document.getElementById("domFreqLabel").textContent = "Simulated audio pattern (decorative animation)";
+      document.getElementById("acousticMatchLabel").textContent = "Simulated pattern (not a measurement)";
     }
 
     async function playXenoCanto(species) {
@@ -2366,12 +2373,26 @@ ${notes}
       if (streak >= 7) document.getElementById("badge-streak7").style.opacity = "1";
     }
 
+    async function checkBackendHealth() {
+      try {
+        const res = await fetch("/api/health");
+        if (res.ok) {
+          const note = document.getElementById("modelLoadingNote");
+          if (note) note.style.display = "block";
+        }
+      } catch (e) {
+        const note = document.getElementById("modelLoadingNote");
+        if (note) note.style.display = "none";
+      }
+    }
+
     window.onload = () => {
       runFullPipeline();
       simulateBirdCall();
       initMap();
       renderLocalJournal();
       checkAndUpdateStreak(false);
+      checkBackendHealth();
     };
   </script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
