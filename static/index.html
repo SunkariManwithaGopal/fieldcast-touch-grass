@@ -10,7 +10,7 @@
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>" />
-  <link rel="manifest" href="/static/manifest.json" />
+  <link rel="manifest" href="./manifest.json" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -1161,8 +1161,8 @@
       </div>
       <div class="card" style="text-align:center; padding: 30px 20px;">
         <div style="font-size: 2.5rem; margin-bottom: 16px;">📓</div>
-        <h3 style="margin-bottom: 12px; color: var(--accent-violet);">Persistent Memory</h3>
-        <p style="color: var(--text-secondary); font-size: 0.9rem;">Backboard Cloud logs your sightings so the AI remembers your past expeditions.</p>
+        <h3 style="margin-bottom: 12px; color: var(--accent-violet);">Field Journal</h3>
+        <p style="color: var(--text-secondary); font-size: 0.9rem;">Record your sightings and reflections from unplugged field walks.</p>
       </div>
     </div>
   </div>
@@ -1170,7 +1170,7 @@
   <div class="app-container view" id="view-logbook">
     <div style="padding: 40px 20px; max-width: 800px; margin: 0 auto;">
       <h2 style="font-size: 2rem; margin-bottom: 8px;">📓 Your Field Logbook</h2>
-      <p style="color: var(--text-secondary); margin-bottom: 32px;">Memories synced to Backboard Cloud.</p>
+      <p style="color: var(--text-secondary); margin-bottom: 32px;">Field journal entries and walk history.</p>
       
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px;">
         <div class="card" style="padding: 20px;">
@@ -1210,10 +1210,10 @@
   <div class="app-container view" id="view-account">
     <div style="padding: 40px 20px;">
       <h2>👤 Account Settings</h2>
-      <p style="color: var(--text-secondary); margin-bottom: 20px;">Manage your offline priorities and Backboard connection.</p>
+      <p style="color: var(--text-secondary); margin-bottom: 20px;">Manage your field parameters and preferences.</p>
       <div class="card" style="max-width: 400px;">
-        <label style="display:block; margin-bottom: 8px;">Backboard API Key (Optional)</label>
-        <input type="password" placeholder="sk-bb-..." class="memory-textarea" />
+        <label style="display:block; margin-bottom: 8px;">Cloud Sync API Key (Optional)</label>
+        <input type="password" placeholder="sk-..." class="memory-textarea" />
         <button class="btn btn-sky btn-sm" style="margin-top: 10px;">Save Configuration</button>
       </div>
     </div>
@@ -1225,7 +1225,7 @@
       <div class="header-brand">
         <div class="header-title">
           <h1>🌿 FieldCast Studio</h1>
-          <span class="tech-badge">TabPFN · Gemma 2B · Backboard · Render</span>
+          <span class="tech-badge">FieldCast Studio · Touch Grass</span>
         </div>
         <p class="header-subtitle">
           1. TabPFN predicts your peak ecological window → 2. Gemma 2B generates a printable 1-page field zine → 3. Leave phone, walk outside
@@ -1325,8 +1325,8 @@
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-label card-label-sky">🎙️ 2. Offline Trail Audio FFT Spectrogram</div>
-              <p class="card-desc">Isolate avian syrinx harmonics (2.4–3.8 kHz) offline</p>
+              <div class="card-label card-label-sky">🎙️ 2. Audio Spectrogram (Decorative Animation)</div>
+              <p class="card-desc">Simulated avian syrinx harmonics (decorative animation)</p>
             </div>
             <div class="card-header-actions">
               <button onclick="simulateBirdCall()" class="btn btn-ghost btn-sm">🐦 Simulate Kingfisher</button>
@@ -1335,8 +1335,8 @@
           </div>
           <canvas id="specCanvas" width="440" height="80" class="spec-canvas"></canvas>
           <div class="spec-info">
-            <span class="freq" id="domFreqLabel">Peak Band: 2,840 Hz (Avian Syrinx Band)</span>
-            <span class="match" id="acousticMatchLabel">Match: White-throated Kingfisher</span>
+            <span class="freq" id="domFreqLabel">Simulated Band: 2,840 Hz (Syrinx Band)</span>
+            <span class="match" id="acousticMatchLabel">Display: Simulated Audio Pattern</span>
           </div>
         </div>
 
@@ -1352,23 +1352,23 @@
           <div class="species-grid" id="inatSpeciesGrid"></div>
         </div>
 
-        <!-- Card 3: Backboard Persistent Memory -->
+        <!-- Card 3: Field Expedition Journal -->
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-label card-label-amber">🧠 3. Backboard.io Persistent Field Memory</div>
+              <div class="card-label card-label-amber">📓 3. Field Expedition Journal</div>
             </div>
-            <span id="bbBadge" class="tech-badge" style="color:var(--accent-indigo); border-color:rgba(129,140,248,0.2); background:rgba(129,140,248,0.08);">backboard-sdk Ready</span>
+            <span id="bbBadge" class="tech-badge" style="color:var(--accent-indigo); border-color:rgba(129,140,248,0.2); background:rgba(129,140,248,0.08);">Journal Ready</span>
           </div>
-          <textarea id="postWalkNotes" rows="2" class="memory-textarea">Spotted a White-throated Kingfisher perched near the water edge (2.8 kHz call) during the TabPFN Peak_Avian_Chorus window and solved my async state bug while walking!</textarea>
+          <textarea id="postWalkNotes" rows="2" class="memory-textarea">Spotted a White-throated Kingfisher perched near the water edge during the afternoon walk.</textarea>
           <div class="memory-actions">
-            <button onclick="syncBackboardMemory()" id="bbSyncBtn" class="btn btn-amber btn-sm">💾 Save to Backboard</button>
+            <button onclick="syncBackboardMemory()" id="bbSyncBtn" class="btn btn-amber btn-sm">💾 Save to Journal</button>
             <button onclick="openMarkdownModal()" class="btn btn-ghost btn-sm">📝 View .md</button>
             <button onclick="exportFieldJournal()" class="btn btn-indigo btn-sm">⬇️ Download .md</button>
           </div>
           <div class="memory-list" id="bbMemoryList">
-            <div class="memory-list-title">Recent Persistent Walk Memories (Backboard):</div>
-            <div>• [Deccan Canopy | Peak_Avian_Chorus] Spotted White-throated Kingfisher (2.8 kHz) at 17:15.</div>
+            <div class="memory-list-title">Recent Field Journal Entries:</div>
+            <div>• [Deccan Canopy] Spotted White-throated Kingfisher near water edge.</div>
           </div>
         </div>
       </div>
@@ -1379,9 +1379,9 @@
           <!-- Zine Header -->
           <div class="zine-header">
             <div>
-              <div class="zine-supertitle">FIELDCAST STUDIO // TABPFN + GEMMA 2B + BACKBOARD ZERO-SCREEN ZINE</div>
+              <div class="zine-supertitle">FIELDCAST STUDIO // ZERO-SCREEN POCKET FIELD ZINE</div>
               <h2 id="zineTitle" class="zine-title">Deccan Urban Canopy & Lake Edge Micro-Expedition</h2>
-              <p id="zineMeta" class="zine-meta">TabPFN Window: Peak_Avian_Chorus (94.2%) • Optimal Slot: 17:00 • 25.8°C</p>
+              <p id="zineMeta" class="zine-meta">Window: Peak_Avian_Chorus (preset values from rules, not model probabilities) • Optimal Slot: 17:00 • 25.8°C</p>
             </div>
             <div class="zine-phone-box">
               <div>PHONE: <span class="warn">LEAVE AT DESK</span></div>
@@ -1392,8 +1392,8 @@
           <!-- TabPFN Classification Bar -->
           <div class="zine-tabpfn-bar">
             <div>
-              <span class="zine-tabpfn-label">PRIOR LABS TABPFN ECOLOGICAL CLASSIFICATION</span>
-              <p id="zineTabpfnSummary" class="zine-tabpfn-text">Predicted State: Peak_Avian_Chorus (94.2% confidence) — Low UV + Mild Breeze triggers evening canopy foraging.</p>
+              <span class="zine-tabpfn-label">ECOLOGICAL WINDOW ASSESSMENT</span>
+              <p id="zineTabpfnSummary" class="zine-tabpfn-text">Predicted State: Peak_Avian_Chorus (preset values from rules, not model probabilities) — Low UV + Mild Breeze triggers evening canopy foraging.</p>
             </div>
             <span id="zineBestSlot" class="zine-best-slot">Best Window: 17:00 (Score: 94.2/100)</span>
           </div>
@@ -1427,7 +1427,7 @@
 
           <!-- Footer -->
           <div class="zine-footer">
-            <span id="statusBadge">Engines: TabPFNClassifier + Local Gemma 2B + Backboard Memory</span>
+            <span id="statusBadge">Engines: FieldCast Studio Adaptive Pipeline</span>
             <span>✂️ Fold horizontally • Zero location data sent to proprietary clouds</span>
           </div>
         </div>
@@ -1836,9 +1836,10 @@
         }
         const top = Object.keys(probs).reduce((a, b) => probs[a] > probs[b] ? a : b);
         return {
-          engine: "Prior Labs TabPFNClassifier (Tabular Foundation Model)",
+          engine: "Rule-Based Heuristic (Client Approximation)",
           predicted_class: top,
           confidence_pct: probs[top],
+          confidence_label: "preset confidence (rule-based)",
           probabilities: probs,
           best_window_today: { hour: "17:00", score: 94.2, dominant_state: "Peak_Avian_Chorus" }
         };
@@ -1900,15 +1901,18 @@
         const cleaned = String(data.response || "").replace(/```json/gi, "").replace(/```/g, "").trim();
         const parsed = JSON.parse(cleaned);
         if (!parsed.bounties || parsed.bounties.length < 3) throw new Error("Fallback");
-        renderZine(parsed, payload, tabRes, `TabPFN + Local Ollama (${model}) + Backboard`);
+        renderZine(parsed, payload, tabRes, `Local Ollama (${model}) + FieldCast`);
       } catch (e) {
         const preset = JSON.parse(JSON.stringify(biomePresets[biomeKey]));
-        renderZine(preset, payload, tabRes, `TabPFNClassifier + Gemma 2B + Backboard Memory`);
+        renderZine(preset, payload, tabRes, `Curated Regional Presets`);
       }
     }
 
     function renderTabPFNWidget(tabRes) {
       const box = document.getElementById("tabpfnBox");
+      const isTabPFN = tabRes.engine_used === "tabpfn_v2" || (tabRes.engine && tabRes.engine.includes("Prior Labs TabPFNClassifier v2"));
+      const engineTitle = isTabPFN ? `TabPFN v2 Top Class: ${tabRes.predicted_class}` : `Heuristic Top Class: ${tabRes.predicted_class}`;
+      const subtitle = isTabPFN ? `Model Probabilities (TabPFN v2 foundation model)` : `Preset confidence values from rules, not model probabilities`;
       const bars = Object.entries(tabRes.probabilities).map(([k, v]) => `
         <div>
           <div class="prob-bar-row">
@@ -1923,9 +1927,10 @@
 
       box.innerHTML = `
         <div class="tabpfn-header">
-          <span class="tabpfn-class">TabPFN Top Class: ${tabRes.predicted_class}</span>
+          <span class="tabpfn-class">${engineTitle}</span>
           <span class="tabpfn-slot">Best Slot: ${tabRes.best_window_today.hour}</span>
         </div>
+        <div style="font-size: 0.72rem; color: var(--text-secondary); margin-bottom: 8px;">${subtitle}</div>
         ${bars}
         <div id="forecastTimelineContainer" style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border-subtle);">
           <h4 style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 8px;">24-Hour Timeline</h4>
@@ -1977,9 +1982,12 @@
 
     function renderZine(zine, payload, tabRes, source) {
       currentZine = zine;
+      const isTabPFN = tabRes.engine_used === "tabpfn_v2" || (tabRes.engine && tabRes.engine.includes("Prior Labs TabPFNClassifier v2"));
+      const confText = isTabPFN ? `${tabRes.confidence_pct}% confidence` : `preset values from rules, not model probabilities (${tabRes.confidence_pct}%)`;
+      const engineLabel = isTabPFN ? "TabPFN" : "Heuristic Rule";
       document.getElementById("zineTitle").textContent = zine.title;
-      document.getElementById("zineMeta").textContent = `TabPFN Class: ${tabRes.predicted_class} (${tabRes.confidence_pct}%) • ${payload.temp_c}°C, RH ${payload.humidity_pct}%, AQI ${payload.aqi}`;
-      document.getElementById("zineTabpfnSummary").textContent = `TabPFN Classification: ${tabRes.predicted_class} (${tabRes.confidence_pct}% confidence) from 8 micro-climate telemetry features.`;
+      document.getElementById("zineMeta").textContent = `${engineLabel} Class: ${tabRes.predicted_class} (${confText}) • ${payload.temp_c}°C, RH ${payload.humidity_pct}%, AQI ${payload.aqi}`;
+      document.getElementById("zineTabpfnSummary").textContent = `${engineLabel} Assessment: ${tabRes.predicted_class} (${confText}) from micro-climate telemetry features.`;
       document.getElementById("zineBestSlot").textContent = `Peak Window: ${tabRes.best_window_today.hour} (${tabRes.best_window_today.score}/100)`;
       document.getElementById("zineSensory").textContent = zine.sensory;
       document.getElementById("zineBrainPrompt").textContent = zine.brain_prompt;
@@ -1998,7 +2006,7 @@
           </div>
           <div class="bounty-clue">
             🎵 Clue: ${escapeHtml(b.call_clue)}
-            ${b.category.includes('🐦') || b.category.includes('🦅') || b.category.includes('🦩') || b.category.includes('Bird') ? `<button onclick="playXenoCanto('${escapeHtml(b.name.split('/')[0].trim())}')" class="btn btn-sky btn-sm no-print" style="margin-left: 10px; padding: 2px 8px; font-size: 0.75rem;">🔊 Listen (xeno-canto)</button>` : ''}
+            ${b.category.includes('🐦') || b.category.includes('🦅') || b.category.includes('🦩') || b.category.includes('Bird') ? `<button onclick="playXenoCanto('${escapeHtml(b.name.split('/')[0].trim())}')" class="btn btn-sky btn-sm no-print" style="margin-left: 10px; padding: 2px 8px; font-size: 0.75rem;">🔊 Audio Preview</button>` : ''}
             <img src="https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=https://www.inaturalist.org/search?q=${encodeURIComponent(b.name)}&color=0d1117&bgcolor=e6edf3" alt="QR" style="float: right; width: 40px; height: 40px; border-radius: 4px; display: none;" class="zine-qr-code" />
           </div>
         </div>
@@ -2056,14 +2064,14 @@
           body: JSON.stringify({ biome: biome, tabpfn_window: win, sightings_note: note })
         });
         const data = await res.json();
-        badge.textContent = data.status === "synced_to_backboard_cloud" ? "✅ Cloud Synced & Model Trained" : "✅ Memory Logged & Model Trained";
-        listEl.innerHTML = `<div class="memory-list-title">${escapeHtml(data.provider)}:</div>` +
+        badge.textContent = "✅ Journal Saved";
+        listEl.innerHTML = `<div class="memory-list-title">Recent Field Journal Entries:</div>` +
           (data.memories || []).map(m => `<div>• ${escapeHtml(m)}</div>`).join("");
       } catch (e) {
-        badge.textContent = "✅ Saved & Trained Locally";
-        listEl.innerHTML += `<div>• [${escapeHtml(biome)} | ${escapeHtml(win)}] ${escapeHtml(note)}</div>`;
+        badge.textContent = "✅ Saved to Local Journal";
+        listEl.innerHTML += `<div>• [${escapeHtml(biome)}] ${escapeHtml(note)}</div>`;
       } finally {
-        btn.textContent = "💾 Save to Backboard";
+        btn.textContent = "💾 Save to Journal";
         checkAndUpdateStreak(true);
       }
     }
@@ -2103,16 +2111,16 @@
           
           // Update the FFT spectrogram visually
           document.getElementById("domFreqLabel").textContent = `Playing: ${rec.en} (${rec.gen} ${rec.sp})`;
-          document.getElementById("acousticMatchLabel").textContent = `xeno-canto ID: XC${rec.id}`;
+          document.getElementById("acousticMatchLabel").textContent = `Audio ID: #${rec.id}`;
           
           // Trigger visualizer
           if(window.audioCtx) return; // If mic is on, leave it.
           simulateBirdCall();
         } else {
-          alert(`No audio found on xeno-canto for ${species}`);
+          alert(`No audio recording found for ${species}`);
         }
       } catch (e) {
-        alert("Failed to fetch from xeno-canto. Check network/CORS.");
+        alert("Audio preview unavailable. Check network connection.");
       }
     }
 
@@ -2158,7 +2166,7 @@
       window.speechSynthesis.cancel();
       const d = currentZine || biomePresets.deccan;
       const t = lastTabpfnResult || { predicted_class: "Peak Avian Chorus", best_window_today: { hour: "17:00" } };
-      const text = `FieldCast Eyes-Up Audio Briefing. TabPFN classifies current conditions as ${t.predicted_class.replace(/_/g, " ")}. Your three offline bounties today are: First, ${d.bounties[0].name}. Look at ${d.bounties[0].where_to_look}. Second, ${d.bounties[1].name}. Third, ${d.bounties[2].name}. Lock your screen now and step outside.`;
+      const text = `FieldCast Eyes-Up Audio Briefing. Current conditions classified as ${t.predicted_class.replace(/_/g, " ")}. Your three field bounties today are: First, ${d.bounties[0].name}. Look at ${d.bounties[0].where_to_look}. Second, ${d.bounties[1].name}. Third, ${d.bounties[2].name}. Lock your screen now and step outside.`;
       const utter = new SpeechSynthesisUtterance(text);
       utter.rate = 0.98;
       window.speechSynthesis.speak(utter);
@@ -2169,20 +2177,22 @@
       const t = lastTabpfnResult || { predicted_class: "Peak_Avian_Chorus", confidence_pct: 92.4, best_window_today: { hour: "17:00", score: 94.2 } };
       const notes = document.getElementById("postWalkNotes").value;
       const dateStr = new Date().toISOString().split("T")[0];
+      const isTabPFN = t.engine_used === "tabpfn_v2";
+      const confLabel = isTabPFN ? `${t.confidence_pct}% confidence` : `preset values from rules, not model probabilities (${t.confidence_pct}%)`;
       return `# 🌿 FieldCast Studio Expedition Log — ${dateStr}
 **Expedition:** ${d.title}
-**TabPFN Classification:** \`${t.predicted_class}\` (${t.confidence_pct}% confidence) | **Optimal Slot:** ${t.best_window_today.hour} (${t.best_window_today.score}/100)
+**Assessment:** \`${t.predicted_class}\` (${confLabel}) | **Optimal Slot:** ${t.best_window_today.hour} (${t.best_window_today.score}/100)
 
 ## 🔍 1. Printable Zine Bounties
 ${d.bounties.map(b => `- [x] **${b.name}** (${b.category})\n  - *Field Marks:* ${b.field_marks}\n  - *Habitat:* ${b.where_to_look}\n  - *Clue:* ${b.call_clue}`).join("\n")}
 
-## 🧭 2. Optical & Acoustic Calibration
+## 🧭 2. Optical & Acoustic Reset
 > ${d.sensory}
 
 ## 🧠 3. Unplugged Walking Reflection
 > *${d.brain_prompt}*
 
-## 📓 4. Post-Walk Sightings & Backboard Memory Note
+## 📓 4. Post-Walk Sightings & Field Notes
 ${notes}
 `;
     }
@@ -2257,8 +2267,8 @@ ${notes}
     // PWA Service Worker Registration
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/static/sw.js').catch(err => {
-          console.log('SW registration failed (expected if no sw.js exists yet)');
+        navigator.serviceWorker.register('./sw.js').catch(err => {
+          console.log('SW registration note:', err);
         });
       });
     }

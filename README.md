@@ -21,9 +21,8 @@ FieldCast Studio has two distinct execution tiers:
 | **Tabular Ecological State Prediction** | **JavaScript Threshold Rules:** Deterministic `if/else` ladder based on hard thresholds (rain ≥ 10mm, humidity ≥ 82%, temp ≥ 34°C, hour ≤ 8 or ≥ 17). | **Prior Labs TabPFN v2:** TabPFNClassifier V2 Apache-2.0 open-weight tabular foundation model fitted in-context on 8 meteorological features. | Saved raw response: [`outputs/tabpfn_raw.json`](outputs/tabpfn_raw.json) |
 | **Field Zine Generation** | **Client-Side Curated Presets:** Hardcoded regional species, sensory prompts, and observation anchors rendered in browser. | **Local Gemma 2B via Ollama:** Calls `gemma2:2b` at `http://127.0.0.1:11434` to dynamically compose structured JSON field guides. | Saved raw response: [`outputs/gemma_raw.json`](outputs/gemma_raw.json) |
 | **24-Hour Forecast** | Browser fetches Open-Meteo hourly weather directly. | Backend proxies Open-Meteo and predicts each hour with TabPFN. | 24-hour evaluation: [`outputs/comparison.csv`](outputs/comparison.csv) |
-| **Persistent Memory** | LocalStorage in browser. | Optional Backboard cloud sync (`backboard-sdk`) with in-memory fallback. | Logged in `app.py` & `render.yaml` |
 | **Nearby Species** | Direct client fetch from iNaturalist Open API (last 14 days research-grade observations within 5 km). | FastAPI endpoint `/api/nearby-species` queries iNaturalist via `httpx`. | iNaturalist API |
-| **Audio FFT Spectrogram** | HTML5 Canvas Web Audio API with offline simulated syrinx band harmonic visualization. | Same frontend canvas widget. | Client-side Canvas |
+| **Audio Spectrogram** | HTML5 Canvas decorative animation simulating syrinx harmonics. | Same frontend canvas widget. | Client-side Canvas |
 | **Field Bounties & QR Code** | Prints QR code encoding an iNaturalist search URL (`https://www.inaturalist.org/search?q={species}`). | Same frontend print template. | Formatted in `index.html` |
 
 ---
@@ -38,6 +37,7 @@ The full dataset is saved in [`outputs/comparison_local_hour.csv`](outputs/compa
 - **Total Hours Evaluated:** 24 consecutive local hours
 - **Top State Disagreement:** **5 out of 24 hours (20.8%)**
 - **Top State Agreement:** **19 out of 24 hours (79.2%)**
+- In-range hours (6 to 18): 5 of 13 differ. Evening/night hours are outside the training hour range.
 - **Impact of Pressure Feature (Surface Pressure vs. MSL Pressure):**
   - Raw surface pressure in Hyderabad (~956 hPa) is outside the training dataset range (`[1002, 1016]` hPa).
   - When comparing Run 1 (`surface_pressure` ~956 hPa) vs Run 2 (`pressure_msl` ~1012 hPa), the top predicted class changed in **0 out of 24 hours (0.0%)**, though probabilities became sharper with in-distribution MSL pressure.
