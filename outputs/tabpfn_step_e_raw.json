@@ -1,0 +1,50 @@
+{
+  "engine": "Prior Labs TabPFNClassifier v2 (Open-Weight Tabular Foundation Model)",
+  "engine_used": "tabpfn_v2",
+  "training_rows": 32,
+  "predicted_class": "Peak_Avian_Chorus",
+  "confidence_pct": 100.0,
+  "probabilities": {
+    "High_UV_AQI_Short_Shade_Walk": 0.0,
+    "Peak_Avian_Chorus": 100.0,
+    "Pollinator_Foraging_Peak": 0.0,
+    "Post_Rain_Canopy_Emergence": 0.0
+  },
+  "best_window_today": {
+    "hour": "17:00",
+    "score": 99.9,
+    "dominant_state": "Peak_Avian_Chorus"
+  },
+  "hourly_curve": [
+    {
+      "hour": "17:00",
+      "score": 99.9,
+      "dominant_state": "Peak_Avian_Chorus"
+    },
+    {
+      "hour": "19:00",
+      "score": 99.4,
+      "dominant_state": "Peak_Avian_Chorus"
+    },
+    {
+      "hour": "21:00",
+      "score": 98.8,
+      "dominant_state": "Peak_Avian_Chorus"
+    },
+    {
+      "hour": "23:00",
+      "score": 98.9,
+      "dominant_state": "Peak_Avian_Chorus"
+    },
+    {
+      "hour": "01:00",
+      "score": 97.8,
+      "dominant_state": "Peak_Avian_Chorus"
+    },
+    {
+      "hour": "03:00",
+      "score": 97.9,
+      "dominant_state": "Peak_Avian_Chorus"
+    }
+  ]
+}

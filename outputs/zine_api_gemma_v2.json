@@ -1,0 +1,28 @@
+{
+  "title": "Deccan Peak Avian Chorus - Troubleshooting Eyes-up Reset",
+  "sensory": "Sight and sound, especially with an emphasis on recording high-quality audio and detailed observations of the Avian Chorus.",
+  "brain_prompt": "Focus on understanding the role of the async race condition in the Avian Chorus. Utilize the provided audio and field observations to understand the problem. Explore alternative approaches for resetting the system and minimize potential disruptions to the chorus.",
+  "bounties": [
+    {
+      "category": "\ud83d\udc26 Avian Acoustic & Visual",
+      "name": "White-throated Kingfisher (Halcyon smyrnensis)",
+      "field_marks": "Electric turquoise back, chestnut head, coral-red dagger bill, stark white throat patch.",
+      "where_to_look": "Low utility wires, exposed dead branches near water edges, and open park perching posts.",
+      "call_clue": "Rapid descending cackling laugh (2.4\u20133.2 kHz peak band) given in flight."
+    },
+    {
+      "category": "\ud83c\udf33 Botanical / Canopy",
+      "name": "Neem (Azadirachta indica) & Copper Pod (Peltophorum)",
+      "field_marks": "Neem: Curved asymmetrical serrated leaflets. Copper Pod: Bipinnate feathery leaves with flat rusty seed pods.",
+      "where_to_look": "Avenue shade canopies and fallen leaf litter along walking tracks.",
+      "call_clue": "Crush one fallen Neem leaflet to release volatile azadirachtin/terpenoid aromatics."
+    },
+    {
+      "category": "\ud83e\udd8b Pollinator / Outcrop",
+      "name": "Plain Tiger Butterfly (Danaus chrysippus) or Rock Agama",
+      "field_marks": "Tawny orange wings with black-and-white apical spots; or Peninsular Rock Agama basking on granite boulders.",
+      "where_to_look": "Sunlit Calotropis/Lantana shrubs and sun-warmed Deccan rock outcrops.",
+      "call_clue": "Slow, unhurried gliding flight\u2014predators avoid its cardiac glycoside alkaloids."
+    }
+  ]
+}

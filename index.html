@@ -1067,7 +1067,8 @@
     <div class="nav-links">
       <div id="streakCounter" class="nav-btn" style="color: var(--accent-amber); display:none; cursor:default; background: rgba(245, 158, 11, 0.1);">🔥 0 Day Streak</div>
       <button onclick="switchView('home')" class="nav-btn active" id="nav-home">🏠 Home</button>
-      <button onclick="switchView('map')" class="nav-btn" id="nav-map">🗺️ Map & Predict</button>
+      <button onclick="switchView('map')" class="nav-btn" id="nav-map">🌤️ Weather Window</button>
+      <button onclick="switchView('map')" class="nav-btn" id="nav-zine">📖 Field Zine</button>
       <button onclick="switchView('logbook')" class="nav-btn" id="nav-logbook">📓 Logbook</button>
       <button onclick="switchView('account')" class="nav-btn" id="nav-account">👤 Account</button>
     </div>
@@ -1253,7 +1254,7 @@
         <div class="card" id="tabpfn-card">
           <div class="card-header">
             <div>
-              <div class="card-label card-label-emerald">📊 1. TabPFN Ecological Predictor</div>
+              <div class="card-label card-label-emerald">📊 1. Weather Window (rules in the live demo; TabPFN when the local backend runs)</div>
               <p class="card-desc" id="csvStatusText">Zero-shot tabular classification on 8 micro-climate features</p>
             </div>
             <div class="card-header-actions">
@@ -1312,9 +1313,17 @@
             <input id="brainStuck" type="text" value="Debugging an async race condition & need an eyes-up reset" placeholder="What screen task are you unplugging from?" />
           </div>
 
-          <button onclick="runFullPipeline()" id="runBtn" class="btn btn-primary btn-full" style="margin-top:12px;">
-            ⚡ Run TabPFN Classifier + Generate Local Gemma Field Zine
-          </button>
+          <div style="display: flex; gap: 10px; margin-top: 12px;">
+            <button onclick="checkWeatherWindowOnly()" id="weatherBtn" class="btn btn-emerald" style="flex: 1;">
+              🌤️ Check Weather Window
+            </button>
+            <button onclick="runFullPipeline()" id="runBtn" class="btn btn-primary" style="flex: 1;">
+              📖 Generate Field Zine
+            </button>
+          </div>
+          <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 6px; text-align: center;">
+            First request can take about a minute while models load.
+          </p>
 
           <div class="tabpfn-output" id="tabpfnBox"></div>
         </div>
@@ -1839,9 +1848,28 @@
           confidence_pct: probs[top],
           confidence_label: "preset values from rules, not model probabilities",
           probabilities: probs,
-          best_window_today: { hour: "17:00", score: 94.2, dominant_state: "Peak_Avian_Chorus", type: "rule preset" }
+          best_window_today: { hour: "not computed in the live demo", score: null, dominant_state: null, type: "rule preset" }
         };
       }
+    }
+
+    async function checkWeatherWindowOnly() {
+      const btn = document.getElementById("weatherBtn");
+      if (btn) btn.textContent = "⏳ Evaluating...";
+      const payload = {
+        temp_c: parseFloat(document.getElementById("t_temp").value) || 25.8,
+        humidity_pct: parseFloat(document.getElementById("t_hum").value) || 60,
+        uv_index: parseFloat(document.getElementById("t_uv").value) || 1.4,
+        aqi: parseFloat(document.getElementById("t_aqi").value) || 46,
+        wind_kmh: parseFloat(document.getElementById("t_wind").value) || 7.5,
+        rain_24h_mm: parseFloat(document.getElementById("t_rain").value) || 0,
+        pressure_hpa: parseFloat(document.getElementById("t_pres").value) || 1013,
+        hour_of_day: parseInt(document.getElementById("t_hour").value) || 17
+      };
+      const tabRes = await runTabPFN(payload);
+      lastTabpfnResult = tabRes;
+      renderTabPFNWidget(tabRes);
+      if (btn) btn.textContent = "🌤️ Check Weather Window";
     }
 
     async function runFullPipeline() {
@@ -1898,7 +1926,8 @@
         const data = await res.json();
         const cleaned = String(data.response || "").replace(/```json/gi, "").replace(/```/g, "").trim();
         const parsed = JSON.parse(cleaned);
-        if (!parsed.bounties || parsed.bounties.length < 3) throw new Error("Fallback");
+        const selectedPreset = biomePresets[biomeKey] || biomePresets.deccan;
+        parsed.bounties = JSON.parse(JSON.stringify(selectedPreset.bounties));
         renderZine(parsed, payload, tabRes, `Local Ollama (${model}) + FieldCast`);
       } catch (e) {
         const preset = JSON.parse(JSON.stringify(biomePresets[biomeKey]));
@@ -1909,7 +1938,8 @@
     function renderTabPFNWidget(tabRes) {
       const box = document.getElementById("tabpfnBox");
       const isTabPFN = tabRes.engine_used === "tabpfn_v2" || (tabRes.engine && tabRes.engine.includes("Prior Labs TabPFNClassifier v2"));
-      const engineTitle = isTabPFN ? `TabPFN v2 Top Class: ${tabRes.predicted_class}` : `Heuristic Top Class: ${tabRes.predicted_class}`;
+      const engineHeading = isTabPFN ? "TabPFN v2 Foundation Model" : "Rule-based estimate";
+      const engineTitle = `${engineHeading}: ${tabRes.predicted_class}`;
       const subtitle = isTabPFN ? `Model Probabilities (TabPFN v2 foundation model)` : `Preset confidence values from rules, not model probabilities`;
       const bars = Object.entries(tabRes.probabilities).map(([k, v]) => `
         <div>
@@ -1926,7 +1956,7 @@
       box.innerHTML = `
         <div class="tabpfn-header">
           <span class="tabpfn-class">${engineTitle}</span>
-          <span class="tabpfn-slot">${isTabPFN ? `Best Slot: ${tabRes.best_window_today.hour}` : `Best Slot (rule preset): ${tabRes.best_window_today.hour}`}</span>
+          <span class="tabpfn-slot">${isTabPFN ? `Best Slot: ${tabRes.best_window_today.hour}` : `Best slot: not computed in the live demo`}</span>
         </div>
         <div style="font-size: 0.72rem; color: var(--text-secondary); margin-bottom: 8px;">${subtitle}</div>
         ${bars}
@@ -1972,9 +2002,15 @@
             badge.innerHTML = `📍 Live: ${nowScore.dominant_state.replace(/_/g, ' ')} (${nowScore.score}/100)`;
             badge.style.animation = 'none';
           }
+        } else {
+          throw new Error("No forecast data");
         }
       } catch (e) {
         console.error("Forecast fetch failed:", e);
+        const timeline = document.getElementById("forecastTimeline");
+        if (timeline) {
+          timeline.innerHTML = `<span style="font-size: 0.72rem; color: var(--text-muted); font-style: italic;">24-hour timeline requires local backend (/api/ecological-forecast). Not computed in the live demo.</span>`;
+        }
       }
     }
 
@@ -1986,7 +2022,7 @@
       document.getElementById("zineTitle").textContent = zine.title;
       document.getElementById("zineMeta").textContent = `${engineLabel} Class: ${tabRes.predicted_class} (${confText}) • ${payload.temp_c}°C, RH ${payload.humidity_pct}%, AQI ${payload.aqi}`;
       document.getElementById("zineTabpfnSummary").textContent = `${engineLabel} Assessment: ${tabRes.predicted_class} (${confText}) from micro-climate telemetry features.`;
-      document.getElementById("zineBestSlot").textContent = isTabPFN ? `Peak Window: ${tabRes.best_window_today.hour} (${tabRes.best_window_today.score}/100)` : `Peak Window (rule preset): ${tabRes.best_window_today.hour} (${tabRes.best_window_today.score}/100)`;
+      document.getElementById("zineBestSlot").textContent = isTabPFN ? `Peak Window: ${tabRes.best_window_today.hour} (${tabRes.best_window_today.score}/100)` : `Best slot: not computed in the live demo`;
       document.getElementById("zineSensory").textContent = zine.sensory;
       document.getElementById("zineBrainPrompt").textContent = zine.brain_prompt;
       document.getElementById("statusBadge").textContent = `Engines: ${source}`;
@@ -2113,7 +2149,7 @@
         if (frame > 35) clearInterval(specInterval);
       }, 60);
       document.getElementById("domFreqLabel").textContent = "Peak Syrinx Harmonics: 2,860 Hz (6.2 notes/sec)";
-      document.getElementById("acousticMatchLabel").textContent = "Match: Halcyon smyrnensis (Kingfisher)";
+      document.getElementById("acousticMatchLabel").textContent = "Live frequency view (no species ID)";
     }
 
     async function playXenoCanto(species) {
@@ -2157,6 +2193,7 @@
         const dataArr = new Uint8Array(analyser.frequencyBinCount);
         const canvas = document.getElementById("specCanvas");
         const ctx = canvas.getContext("2d");
+        document.getElementById("acousticMatchLabel").textContent = "Live frequency view (no species ID)";
         clearInterval(specInterval);
         specInterval = setInterval(() => {
           analyser.getByteFrequencyData(dataArr);

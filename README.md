@@ -20,9 +20,9 @@ FieldCast Studio has two distinct execution tiers:
 |---|---|---|---|
 | **Tabular Ecological State Prediction** | **JavaScript Threshold Rules:** Deterministic `if/else` ladder based on hard thresholds (rain ≥ 10mm, humidity ≥ 82%, temp ≥ 34°C, hour ≤ 8 or ≥ 17). | **Prior Labs TabPFN v2:** TabPFNClassifier V2 tabular foundation model fitted in-context on 8 meteorological features. | Saved raw response: [`outputs/tabpfn_raw.json`](outputs/tabpfn_raw.json) |
 | **Field Zine Generation** | **Client-Side Curated Presets:** Hardcoded regional species, sensory prompts, and observation anchors rendered in browser. | **Local Gemma 2B via Ollama:** Calls `gemma2:2b` at `http://127.0.0.1:11434` to dynamically compose structured JSON field guides. | Saved raw response: [`outputs/gemma_raw.json`](outputs/gemma_raw.json) |
-| **24-Hour Forecast** | Browser fetches Open-Meteo hourly weather directly. | Backend proxies Open-Meteo and predicts each hour with TabPFN. | 24-hour evaluation: [`outputs/comparison.csv`](outputs/comparison.csv) |
+| **24-Hour Forecast** | **Not computed in live demo** (browser fetches current weather only). | Backend proxies Open-Meteo and predicts each hour with TabPFN. | 24-hour evaluation: [`outputs/comparison_local_hour.csv`](outputs/comparison_local_hour.csv) |
 | **Nearby Species** | Direct client fetch from iNaturalist Open API (last 14 days research-grade observations within 5 km). | FastAPI endpoint `/api/nearby-species` queries iNaturalist via `httpx`. | iNaturalist API |
-| **Audio Spectrogram** | HTML5 Canvas decorative animation simulating syrinx harmonics. | Same frontend canvas widget. | Client-side Canvas |
+| **Audio Spectrogram** | HTML5 Canvas decorative animation or live mic frequency view (no species ID). | Same frontend canvas widget. | Client-side Canvas |
 | **Field Bounties & QR Code** | Prints QR code encoding an iNaturalist search URL (`https://www.inaturalist.org/search?q={species}`). | Same frontend print template. | Formatted in `index.html` |
 
 ---
@@ -58,14 +58,14 @@ The full dataset is saved in [`outputs/comparison_local_hour.csv`](outputs/compa
 
 ---
 
-## ⏱️ Measured Inference Latency (Warm Server)
+## ⏱️ Measured Inference Latency
 
-On a warm local server (second call benchmarked in `outputs/warm_timings.json`):
+Measured across cold start (model load + first inference) and warm server (subsequent inference):
 
-| Endpoint | Engine / Model | Measured Latency | Notes / Timeouts |
-|---|---|---|---|
-| `/api/tabpfn-predict` | Prior Labs TabPFN v2 (CPU/torch) | **4.83 seconds** | In-context inference across 8 meteorological features. Client `fetch()` uses default browser timeout. |
-| `/api/generate-zine` | Google Gemma 2B (`gemma2:2b` via Ollama) | **9.97 seconds** | Local LLM structured JSON generation. Server timeout: 45.0s (`httpx.Timeout(45.0)`). |
+| Endpoint | Engine / Model | Cold Start (Call 1) | Warm Server (Call 2) | Notes / Timeouts |
+|---|---|---|---|---|
+| `/api/tabpfn-predict` | Prior Labs TabPFN v2 (CPU/torch) | **68.2 seconds** | **4.83 seconds** | Loads TabPFN v2 weights into torch memory and fits on 32-row trail context. Client `fetch()` uses default browser timeout. |
+| `/api/generate-zine` | Google Gemma 2B (`gemma2:2b` via Ollama) | **34.1 seconds** | **9.97 seconds** | Local LLM structured JSON generation. Server timeout: 45.0s (`httpx.Timeout(45.0)`). |
 
 ---
 
