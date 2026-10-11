@@ -1212,9 +1212,7 @@
       <h2>👤 Account Settings</h2>
       <p style="color: var(--text-secondary); margin-bottom: 20px;">Manage your field parameters and preferences.</p>
       <div class="card" style="max-width: 400px;">
-        <label style="display:block; margin-bottom: 8px;">Cloud Sync API Key (Optional)</label>
-        <input type="password" placeholder="sk-..." class="memory-textarea" />
-        <button class="btn btn-sky btn-sm" style="margin-top: 10px;">Save Configuration</button>
+        <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0;">No external account or cloud sync key required. All expedition data and field journal entries are stored locally in your browser.</p>
       </div>
     </div>
   </div>
@@ -1228,7 +1226,7 @@
           <span class="tech-badge">FieldCast Studio · Touch Grass</span>
         </div>
         <p class="header-subtitle">
-          1. TabPFN predicts your peak ecological window → 2. Gemma 2B generates a printable 1-page field zine → 3. Leave phone, walk outside
+          1. Check the weather window → 2. Print a one-page field zine → 3. Leave the phone and walk outside
         </p>
       </div>
       <div class="header-actions">
@@ -1368,7 +1366,7 @@
           </div>
           <div class="memory-list" id="bbMemoryList">
             <div class="memory-list-title">Recent Field Journal Entries:</div>
-            <div>• [Deccan Canopy] Spotted White-throated Kingfisher near water edge.</div>
+            <div id="journalEmptyMsg" style="font-size:0.75rem; color:var(--text-muted); font-style:italic;">No entries yet. Write your sightings and save.</div>
           </div>
         </div>
       </div>
@@ -1428,7 +1426,7 @@
           <!-- Footer -->
           <div class="zine-footer">
             <span id="statusBadge">Engines: FieldCast Studio Adaptive Pipeline</span>
-            <span>✂️ Fold horizontally • Zero location data sent to proprietary clouds</span>
+            <span>✂️ Fold horizontally • Location goes only to Open-Meteo and iNaturalist</span>
           </div>
         </div>
       </div>
@@ -1649,14 +1647,14 @@
       const btn = document.getElementById("meteoBtn");
       btn.textContent = "⏳ Syncing...";
       try {
-        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,surface_pressure,wind_speed_10m,precipitation,uv_index`);
+        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,precipitation,uv_index`);
         if (!res.ok) throw new Error("Weather API failed");
         
         const data = await res.json();
         if (data && data.current) {
           document.getElementById("t_temp").value = data.current.temperature_2m;
           document.getElementById("t_hum").value = data.current.relative_humidity_2m;
-          document.getElementById("t_pres").value = Math.round(data.current.surface_pressure);
+          document.getElementById("t_pres").value = Math.round(data.current.pressure_msl);
           document.getElementById("t_wind").value = data.current.wind_speed_10m;
           document.getElementById("t_rain").value = data.current.precipitation || 0;
           if (data.current.uv_index !== undefined) {
@@ -1839,9 +1837,9 @@
           engine: "Rule-Based Heuristic (Client Approximation)",
           predicted_class: top,
           confidence_pct: probs[top],
-          confidence_label: "preset confidence (rule-based)",
+          confidence_label: "preset values from rules, not model probabilities",
           probabilities: probs,
-          best_window_today: { hour: "17:00", score: 94.2, dominant_state: "Peak_Avian_Chorus" }
+          best_window_today: { hour: "17:00", score: 94.2, dominant_state: "Peak_Avian_Chorus", type: "rule preset" }
         };
       }
     }
@@ -1928,7 +1926,7 @@
       box.innerHTML = `
         <div class="tabpfn-header">
           <span class="tabpfn-class">${engineTitle}</span>
-          <span class="tabpfn-slot">Best Slot: ${tabRes.best_window_today.hour}</span>
+          <span class="tabpfn-slot">${isTabPFN ? `Best Slot: ${tabRes.best_window_today.hour}` : `Best Slot (rule preset): ${tabRes.best_window_today.hour}`}</span>
         </div>
         <div style="font-size: 0.72rem; color: var(--text-secondary); margin-bottom: 8px;">${subtitle}</div>
         ${bars}
@@ -1988,7 +1986,7 @@
       document.getElementById("zineTitle").textContent = zine.title;
       document.getElementById("zineMeta").textContent = `${engineLabel} Class: ${tabRes.predicted_class} (${confText}) • ${payload.temp_c}°C, RH ${payload.humidity_pct}%, AQI ${payload.aqi}`;
       document.getElementById("zineTabpfnSummary").textContent = `${engineLabel} Assessment: ${tabRes.predicted_class} (${confText}) from micro-climate telemetry features.`;
-      document.getElementById("zineBestSlot").textContent = `Peak Window: ${tabRes.best_window_today.hour} (${tabRes.best_window_today.score}/100)`;
+      document.getElementById("zineBestSlot").textContent = isTabPFN ? `Peak Window: ${tabRes.best_window_today.hour} (${tabRes.best_window_today.score}/100)` : `Peak Window (rule preset): ${tabRes.best_window_today.hour} (${tabRes.best_window_today.score}/100)`;
       document.getElementById("zineSensory").textContent = zine.sensory;
       document.getElementById("zineBrainPrompt").textContent = zine.brain_prompt;
       document.getElementById("statusBadge").textContent = `Engines: ${source}`;
@@ -2006,7 +2004,6 @@
           </div>
           <div class="bounty-clue">
             🎵 Clue: ${escapeHtml(b.call_clue)}
-            ${b.category.includes('🐦') || b.category.includes('🦅') || b.category.includes('🦩') || b.category.includes('Bird') ? `<button onclick="playXenoCanto('${escapeHtml(b.name.split('/')[0].trim())}')" class="btn btn-sky btn-sm no-print" style="margin-left: 10px; padding: 2px 8px; font-size: 0.75rem;">🔊 Audio Preview</button>` : ''}
             <img src="https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=https://www.inaturalist.org/search?q=${encodeURIComponent(b.name)}&color=0d1117&bgcolor=e6edf3" alt="QR" style="float: right; width: 40px; height: 40px; border-radius: 4px; display: none;" class="zine-qr-code" />
           </div>
         </div>
@@ -2056,7 +2053,7 @@
         });
       } catch(e) { console.error("In-context learning failed", e); }
 
-      // 2. Persist to Backboard Cloud
+      // 2. Persist to backend or localStorage
       try {
         const res = await fetch("/api/backboard-memory", {
           method: "POST",
@@ -2069,11 +2066,32 @@
           (data.memories || []).map(m => `<div>• ${escapeHtml(m)}</div>`).join("");
       } catch (e) {
         badge.textContent = "✅ Saved to Local Journal";
-        listEl.innerHTML += `<div>• [${escapeHtml(biome)}] ${escapeHtml(note)}</div>`;
+        try {
+          const stored = JSON.parse(localStorage.getItem("fc_journal_entries") || "[]");
+          stored.unshift(`[${biome}] ${note}`);
+          localStorage.setItem("fc_journal_entries", JSON.stringify(stored));
+          renderLocalJournal();
+        } catch (_) {
+          listEl.innerHTML += `<div>• [${escapeHtml(biome)}] ${escapeHtml(note)}</div>`;
+        }
       } finally {
         btn.textContent = "💾 Save to Journal";
         checkAndUpdateStreak(true);
       }
+    }
+
+    function renderLocalJournal() {
+      const listEl = document.getElementById("bbMemoryList");
+      if (!listEl) return;
+      try {
+        const stored = JSON.parse(localStorage.getItem("fc_journal_entries") || "[]");
+        if (stored.length === 0) {
+          listEl.innerHTML = `<div class="memory-list-title">Recent Field Journal Entries:</div><div id="journalEmptyMsg" style="font-size:0.75rem; color:var(--text-muted); font-style:italic;">No entries yet. Write your sightings and save.</div>`;
+        } else {
+          listEl.innerHTML = `<div class="memory-list-title">Recent Field Journal Entries:</div>` +
+            stored.map(m => `<div>• ${escapeHtml(m)}</div>`).join("");
+        }
+      } catch (e) {}
     }
 
     function simulateBirdCall() {
@@ -2315,6 +2333,7 @@ ${notes}
       runFullPipeline();
       simulateBirdCall();
       initMap();
+      renderLocalJournal();
       checkAndUpdateStreak(false);
     };
   </script>

@@ -526,7 +526,7 @@ async def ecological_forecast(lat: float, lng: float) -> Dict[str, Any]:
             url = (
                 f"https://api.open-meteo.com/v1/forecast"
                 f"?latitude={lat}&longitude={lng}"
-                f"&hourly=temperature_2m,relative_humidity_2m,surface_pressure,wind_speed_10m,precipitation,uv_index"
+                f"&hourly=temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,precipitation,uv_index"
                 f"&forecast_days=2"
             )
             resp = await client.get(url)
@@ -555,7 +555,7 @@ async def ecological_forecast(lat: float, lng: float) -> Dict[str, Any]:
                     hourly.get("wind_speed_10m", [])[i],
                     hourly.get("uv_index", [])[i] or 0.0,
                     40.0, # Default AQI
-                    hourly.get("surface_pressure", [])[i],
+                    hourly.get("pressure_msl", [])[i],
                     hourly.get("precipitation", [])[i],
                     hr
                 ]])

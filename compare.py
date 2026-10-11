@@ -122,7 +122,13 @@ for idx, m in enumerate(rows_meta):
         "rain_24h_mm": m["rain_24h_mm"],
         "hour_of_day": m["local_hour"],
     }
-    r1 = requests.post("http://127.0.0.1:8000/api/tabpfn-predict", json=p1).json()
+    try:
+        r1 = requests.post("http://127.0.0.1:8000/api/tabpfn-predict", json=p1, timeout=5).json()
+    except Exception:
+        from fastapi.testclient import TestClient
+        from app import app
+        _client = TestClient(app)
+        r1 = _client.post("/api/tabpfn-predict", json=p1).json()
     tabpfn_run1.append(r1)
 
     # Run 2: pressure_msl
@@ -136,7 +142,13 @@ for idx, m in enumerate(rows_meta):
         "rain_24h_mm": m["rain_24h_mm"],
         "hour_of_day": m["local_hour"],
     }
-    r2 = requests.post("http://127.0.0.1:8000/api/tabpfn-predict", json=p2).json()
+    try:
+        r2 = requests.post("http://127.0.0.1:8000/api/tabpfn-predict", json=p2, timeout=5).json()
+    except Exception:
+        from fastapi.testclient import TestClient
+        from app import app
+        _client = TestClient(app)
+        r2 = _client.post("/api/tabpfn-predict", json=p2).json()
     tabpfn_run2.append(r2)
 
 if os.path.exists(temp_inputs_path):

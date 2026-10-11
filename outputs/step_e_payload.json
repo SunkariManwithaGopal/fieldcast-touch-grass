@@ -1,0 +1,10 @@
+{
+  "temp_c": 25.8,
+  "humidity_pct": 60.0,
+  "uv_index": 1.4,
+  "aqi": 46.0,
+  "wind_kmh": 7.5,
+  "rain_24h_mm": 0.0,
+  "pressure_hpa": 1013.0,
+  "hour_of_day": 17
+}
