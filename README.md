@@ -1,64 +1,46 @@
 # 🌿 FieldCast Studio
 
-> **An open-source micro-climate ecological predictor + printable 1-page field zine + acoustic bird spectrogram kit.**
+> **A weather window estimator + printable 1-page pocket field zine.**
 
-FieldCast Studio gets software engineers off their screens and into nature in under 20 seconds. It predicts the best time to go outside using AI, prints a physical field guide so you leave your phone behind, and remembers your nature sightings across sessions.
+FieldCast Studio helps developers step away from screens and into nature. It estimates an optimal outdoor window using weather heuristics and TabPFN (locally), formats a 1-page pocket field guide, and encourages leaving your phone at your desk.
 
 ![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python&style=for-the-badge)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-green?logo=fastapi&style=for-the-badge)
 ![TabPFN](https://img.shields.io/badge/TabPFN-v2-orange?style=for-the-badge)
 ![Gemma](https://img.shields.io/badge/Gemma-2B-blue?logo=google&style=for-the-badge)
-![Render](https://img.shields.io/badge/Deployed-Render-purple?logo=render&style=for-the-badge)
+![GitHub Pages](https://img.shields.io/badge/Hosted-GitHub%20Pages-brightgreen?logo=github&style=for-the-badge)
 
-*(Note: Add your demo GIF here! For now, this is a placeholder)*
-> `![Demo](https://via.placeholder.com/800x400.png?text=Record+a+GIF+of+the+app+and+put+it+here)`
+---
+
+## 🌐 Live Demo vs. Local Execution
+
+- **Live Demo (GitHub Pages):** Runs client-side in your browser. It uses a JavaScript approximation of our weather threshold rules, pre-written regional zine text, and a canvas-animated spectrogram. The "Nearby Wildlife" panel queries live iNaturalist data.
+- **Local Python Environment:** Runs the full FastAPI server with in-context TabPFN v2 inference on weather parameters and local Gemma 2B generation (`gemma2:2b` via Ollama).
 
 ---
 
 ## 🛑 The Problem
 
-Software engineers average **11+ hours of daily screen time**. When they need an outdoor break, they face three decision-fatigue barriers:
+Many of us spend most of our workday in front of screens. When taking an outdoor break, three barriers cause decision fatigue:
 
-1. **When?** — Is now actually a good time weather-wise?
-2. **What do I do?** — Aimless walks feel pointless and end quickly.
-3. **How do I unplug?** — Every "nature app" requires staring at a phone screen outdoors.
+1. **When?** — Uncertainty over whether current weather conditions are comfortable.
+2. **What do I do?** — Aimless walks without an observational goal often end quickly.
+3. **How do I unplug?** — Most nature apps require looking at a phone screen outdoors.
 
 ## 🚀 The Solution
 
-FieldCast Studio uses **two open-weight AI models** (one for numbers, one for language) to eliminate all three barriers:
-
-```mermaid
-graph LR
-    A[🌦️ Open-Meteo<br/>24h Forecast] --> B[📊 TabPFN<br/>Tabular Foundation Model]
-    B --> C{Ecological State<br/>Classification}
-    C --> D[🐦 Peak Avian Chorus]
-    C --> E[🦋 Pollinator Foraging]
-    C --> F[🍄 Post-Rain Emergence]
-    C --> G[☀️ High UV Shade]
-    D & E & F & G --> H[🤖 Gemma 2B<br/>via Ollama]
-    H --> I[🖨️ Printable 1-Page<br/>Field Zine]
-    I --> J[🚪 Leave Phone<br/>Walk Outside]
-    J --> K[📓 Post-Walk<br/>Field Notes]
-    K --> L[🧠 Backboard Cloud<br/>Persistent Memory]
-    A2[📍 Geolocation] --> M[🌍 iNaturalist API<br/>Real Species]
-    A2 --> N[🔊 xeno-canto API<br/>Bird Audio]
-    M & N --> I
-```
+FieldCast Studio addresses this with a simple workflow: evaluate weather data, print a physical one-page pocket guide, and step outside without your phone.
 
 ## ✨ Core Features
 
-| Feature | Technology | What It Does |
+| Feature | Where It Runs | What It Does |
 |---|---|---|
-| **Ecological Window Predictor** | TabPFN v2 | Classifies 8 micro-climate CSV features into 4 ecological states |
-| **24-Hour Timeline Forecast** | Open-Meteo API | Visualizes TabPFN predictions across the entire day |
-| **Printable Field Zine** | Gemma 2B (Ollama) | Generates a `@media print` 1-page zine with species bounties |
-| **Acoustic Bird Referencing** | xeno-canto API | Fetches and plays real bird audio samples for predicted species |
-| **Streak Gamification** | LocalStorage | Motivates daily outdoor habits with 🔥 streaks and badges |
-| **Print-to-Digital QR Codes** | QRServer API | Injects QR links into the print zine bridging physical and digital |
-| **Real Nearby Species** | iNaturalist API | Shows flora/fauna spotted within 5 km in the last 14 days |
-| **Persistent Memory** | Backboard.io SDK | Logs your sightings to a cloud agent brain |
-| **Calendar Block Export** | .ics (RFC 5545) | Downloads a calendar invite to block off your outdoor window |
-| **Social Web Sharing** | Web Share API | Shares your custom zine and predictions to social media |
+| **Weather Window Estimation** | Local (TabPFN) / Demo (JS rules) | Evaluates 7 weather features into 4 outdoor walk states |
+| **24-Hour Timeline** | Browser (Open-Meteo API) | Visualizes state probabilities across the day |
+| **Printable Field Zine** | Local (Gemma 2B) / Demo (Presets) | Formats a `@media print` 1-page foldable guide |
+| **Animated Spectrogram** | Browser (HTML5 Canvas) | Illustrates syrinx harmonics for bird observation |
+| **Nearby Species Panel** | Browser (iNaturalist API) | Shows research-grade sightings within 5 km |
+| **Offline Extras** | Browser | LocalStorage streak tracking and `.ics` calendar exports |
 
 ## 🛠️ Quick Start
 
